@@ -1,11 +1,4 @@
-#exclude everything except OF src
-*
-
-!.gitignore
-!/video/src/main.cpp
-!/video/src/ofApp.cpp
-!/video/src/ofApp.h 
-!/remote/src/main.cpp
-!/remote/src/ofApp.cpp
-!/remote/src/ofApp.h
-
+video/*
+!video/src
+remote/*
+!remote/src
