@@ -2,3 +2,5 @@ video/*
 !video/src
 remote/*
 !remote/src
+*.mov
+*.mp4
