@@ -4,3 +4,5 @@ remote/*
 !remote/src
 *.mov
 *.mp4
+omxplayer/*
+!omxplayer/src
