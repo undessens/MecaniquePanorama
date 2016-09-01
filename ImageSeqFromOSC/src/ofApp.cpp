@@ -44,7 +44,7 @@ void ofApp::setup(){
 	receiver.setup(12345);
 
 	sequence.enableThreadedLoad(true);
-	sequence.loadSequence("", "jpg", 1, 1959, 4);
+	sequence.loadSequence("1/", "jpg", 1, 1959, 4);
 	indexFrame = 0;
 	//sequence.preloadAllFrames();	//this way there is no stutter when loading frames
 	
