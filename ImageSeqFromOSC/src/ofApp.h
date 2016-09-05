@@ -9,11 +9,12 @@
  *  Copyright (c) 2010-2015
  */
 
-#pragma onc
+#pragma once	
 
 #include "ofMain.h"
 #include "ofxImageSequence.h"
 #include "ofxOsc.h"
+
 
 class ofApp : public ofBaseApp
 {
@@ -30,12 +31,24 @@ class ofApp : public ofBaseApp
 	void mousePressed(int x, int y, int button);
 	void mouseReleased(int x, int y, int button);
 	void windowResized(int w, int h);
+	void loadSequence( int i);
+	void listNumSequence();
 	
 	ofxImageSequence sequence;
 	ofImage background;
 	ofxOscReceiver receiver;
 	bool playingMouse;
 	int indexFrame;
+	int currentSequence;
 	bool isFullScreen;
+	int totalNumSequence;
+
+
+	//Transition, image presentation
+	float loadingTime;
+	float loadingStartTime;
+	float loadingDuration;
+	bool isLoading;
+	vector<ofImage> listOfVignette;
 };
 

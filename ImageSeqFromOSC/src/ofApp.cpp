@@ -43,19 +43,27 @@ void ofApp::setup(){
 	//prefix is frame, file type is png, from frame 1 to 11, 2 digits in the number
 	receiver.setup(12345);
 
+	currentSequence = 1;
+	isLoading = false;
+	loadingDuration = 2.5;
+
+
 	sequence.enableThreadedLoad(true);
-	sequence.loadSequence("1/", "jpg", 1, 1959, 4);
+
+	listNumSequence();
+	loadSequence(1);
+	
 	indexFrame = 0;
 	//sequence.preloadAllFrames();	//this way there is no stutter when loading frames
-	
-	//sequence.enableThreadedLoad(true);
-	//sequence.setExtension("jpg");
+
 	//sequence.loadSequence("Decoup-test-sqjpeg");
 
 	//sequence.setFrameRate(10); //set to ten frames per second for Muybridge's horse.
 	
 	playingMouse = false; //controls if playing automatically, or controlled by the mouse
 	isFullScreen = false;
+
+
 }
 
 //--------------------------------------------------------------
@@ -66,7 +74,7 @@ void ofApp::update(){
 		receiver.getNextMessage(&m);
         
 		// check for mouse moved message
-		if(m.getAddress() == "/transport/next"){
+		if(m.getAddress() == "/transport/next" && !isLoading){
 
 			if (indexFrame <  (sequence.getTotalFrames()-1) ){
 
@@ -77,7 +85,7 @@ void ofApp::update(){
 				indexFrame = 0;
 			}
 		}
-		if(m.getAddress() == "/transport/previous"){
+		if(m.getAddress() == "/transport/previous" && !isLoading){
 
 			if( indexFrame > 1){
 
@@ -91,13 +99,27 @@ void ofApp::update(){
 
 
 	}
+
+
+	//loading, image presentation
+	loadingTime = ofGetElapsedTimef() - loadingStartTime;
+	if(loadingTime > loadingDuration){
+
+		isLoading = false;
+	}
+
+
+
+
 }
 
 //--------------------------------------------------------------
 void ofApp::draw(){
 	
-	if(sequence.isLoading()){
+	if(sequence.isLoading() || isLoading){
 		ofBackground(255,0,0);
+		listOfVignette[currentSequence-1].draw(0,0,ofGetWidth(), ofGetHeight());
+
 	}
 	else{
 		ofBackground(0);
@@ -128,9 +150,81 @@ void ofApp::keyPressed(int key){
 		case 'f': isFullScreen = !isFullScreen;
 		ofSetFullscreen( isFullScreen);
 		break;
+		case '1':loadSequence(1);
+		break;
+		case '2':loadSequence(2);
+		break;
+		case '3':loadSequence(3);
+		break;
 	}
 	
 }
+
+//--------------------------------------------------------------
+void ofApp::loadSequence(int num){
+
+
+if( num > 0 && num <(totalNumSequence) && !sequence.isLoading() ){
+	
+	if(sequence.isLoaded()){
+
+		sequence.unloadSequence();
+	}
+
+	switch(num){
+
+		case 1: sequence.loadSequence("1/", "jpg", 1, 1959, 4);
+		break;
+		case 2:sequence.loadSequence("2/", "jpg", 1, 6);
+		break;
+		case 3:
+		break;
+
+
+	}
+
+	loadingTime = 0;
+	loadingStartTime = ofGetElapsedTimef();
+	isLoading = true;
+	currentSequence = num;
+	
+	
+} else {
+
+cout << "\n Not allowed to load this sequence " << ofToString(num);
+
+}
+
+
+}
+
+//--------------------------------------------------------------
+void ofApp::listNumSequence(){
+	//start this function at the beggining, calculate the number of
+	//sequence, according to number of foler placed in data folder
+
+	ofDirectory dir = ofDirectory("");
+	totalNumSequence = 1;
+
+	while ( dir.doesDirectoryExist( ofToString(totalNumSequence))){
+
+		totalNumSequence++;
+	}
+
+	for (int i = 1; i <(totalNumSequence); i++ ){
+
+		ofImage img ;
+		if( !img.load(ofToString(i)+"/intro.jpg")){
+			img.allocate(1080, 720 , OF_IMAGE_COLOR);
+		}
+		listOfVignette.push_back(img);
+	}
+
+	cout<< "\n nb of sequence :" << ofToString(totalNumSequence);
+
+
+}
+
 
 //--------------------------------------------------------------
 void ofApp::keyReleased(int key){

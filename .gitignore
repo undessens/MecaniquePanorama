@@ -3,6 +3,9 @@ video/*
 remote/*
 !remote/src
 *.mov
+.DS_Store
+.com.apple.timemachine.supported
+arduino/.DS_Store
 *.mp4
 ImageSeqFromOSC/*
 !ImageSeqFromOSC/src
