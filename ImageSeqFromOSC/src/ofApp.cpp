@@ -76,9 +76,11 @@ void ofApp::update(){
 		// check for mouse moved message
 		if(m.getAddress() == "/transport/next" && !isLoading){
 
-			if (indexFrame <  (sequence.getTotalFrames()-1) ){
+			int step = m.getArgAsInt(0) + 1;
 
-				indexFrame+=2;
+			if (indexFrame <  (sequence.getTotalFrames()-step) ){
+
+				indexFrame+=step;
 			}
 			else{
 
@@ -87,14 +89,25 @@ void ofApp::update(){
 		}
 		if(m.getAddress() == "/transport/previous" && !isLoading){
 
-			if( indexFrame > 1){
+			int step = m.getArgAsInt(0) + 1;
 
-				indexFrame-=2;
+			if( indexFrame > step){
+
+				indexFrame-=step;
 			}
 			else{
 
 				indexFrame = sequence.getTotalFrames();
 			}
+		}
+		if(m.getAddress() == "/transport/changeSeq" && !isLoading){
+
+			int newSeq = m.getArgAsInt(0);
+
+			loadSequence(newSeq);
+
+
+
 		}
 
 
@@ -137,6 +150,8 @@ void ofApp::draw(){
 			
 		}
 	}
+
+	ofDrawBitmapString()
 }
 
 //--------------------------------------------------------------
