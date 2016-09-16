@@ -53,8 +53,8 @@ void setup(){
 
 void loop(){
   
-  boolean newSens1 = digitalRead(pinSens1);
-  boolean newSens2 = digitalRead(pinSens2);
+  boolean newSens1 = analogRead(pinSens1) < 680;
+  boolean newSens2 = analogRead(pinSens2) < 680;
   
   
   if ( newSens1 &&  sens2 && !sens1 ){
