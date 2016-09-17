@@ -15,6 +15,9 @@
 #include "ofxImageSequence.h"
 #include "ofxOsc.h"
 
+#define IMGSIZE ( 1080)
+
+
 
 class ofApp : public ofBaseApp
 {
@@ -50,5 +53,6 @@ class ofApp : public ofBaseApp
 	float loadingDuration;
 	bool isLoading;
 	vector<ofImage> listOfVignette;
+	ofImage imagePresentation;
 };
 

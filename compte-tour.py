@@ -48,12 +48,12 @@ def serial_ports():
 if __name__ == '__main__':
 
 	#Serial print port available
-	#print serial_ports()
+	print serial_ports()
 
 	#Serial connect
 	try:
 		if sys.platform.startswith('darwin'):
-			ser = serial.Serial('/dev/tty.usbmodem1a131',115200)
+			ser = serial.Serial((serial_ports())[0],115200)
 		elif sys.platform.startswith('linux') or sys.platform.startswith('cygwin'):
 			ser = serial.Serial('/dev/ttyACM0',115200)
 			#ser = serial.Serial('/dev/ttyACM1', 115200)

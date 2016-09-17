@@ -37,6 +37,12 @@
 
 //--------------------------------------------------------------
 void ofApp::setup(){
+	
+	//First of all : change the data path directory to another disk
+	ofSetDataPathRoot("/Volumes/Data/8FabLab/");
+	
+
+
 	//File format for the example frames is
 	//frame01.png 
 	//this creates a method call where the parameters
@@ -48,10 +54,13 @@ void ofApp::setup(){
 	loadingDuration = 2.5;
 
 
+
+
+
 	sequence.enableThreadedLoad(true);
 
 	listNumSequence();
-	loadSequence(1);
+	loadSequence(0);
 	
 	indexFrame = 0;
 	//sequence.preloadAllFrames();	//this way there is no stutter when loading frames
@@ -129,29 +138,40 @@ void ofApp::update(){
 //--------------------------------------------------------------
 void ofApp::draw(){
 	
-	if(sequence.isLoading() || isLoading){
-		ofBackground(255,0,0);
-		listOfVignette[currentSequence-1].draw(0,0,ofGetWidth(), ofGetHeight());
+	if ( currentSequence > 0){
 
-	}
-	else{
-		ofBackground(0);
-		if(playingMouse){
-			//get the frame based on the current time and draw it
-			//get the sequence frame that maps to the mouseX position
-			float percent = ofMap(mouseX, 0, ofGetWidth(), 0, 1.0, true);
-		
-			//draw it.
-			sequence.getTextureForPercent(percent).draw(0, 0);
+		if(sequence.isLoading() || isLoading){
+			ofBackground(255,0,0);
+			ofSetColor(255);
+			listOfVignette[currentSequence-1].draw(0,0,ofGetWidth(), ofGetHeight());
+
 		}
-		else {
-
-			sequence.getTextureForFrame( indexFrame).draw(0,0, ofGetWidth(), ofGetHeight());
+		else{
+			ofBackground(0);
+			ofSetColor(255);
+			if(playingMouse){
+				//get the frame based on the current time and draw it
+				//get the sequence frame that maps to the mouseX position
+				float percent = ofMap(mouseX, 0, ofGetWidth(), 0, 1.0, true);
 			
+				//draw it.
+				sequence.getTextureForPercent(percent).draw(0, 0, ofGetWidth(), ofGetHeight());
+			}
+			else {
+
+				sequence.getTextureForFrame( indexFrame).draw(0,0,ofGetWidth(), ofGetHeight());
+				//sequence.getTextureForFrame( indexFrame).draw(0,0, ofGetWidth(), ofGetHeight());
+				
+			}
 		}
+
+	} else {
+		// Image de presentation
+		imagePresentation.draw(0,0);
+
 	}
 
-	ofDrawBitmapString()
+
 }
 
 //--------------------------------------------------------------
@@ -171,6 +191,10 @@ void ofApp::keyPressed(int key){
 		break;
 		case '3':loadSequence(3);
 		break;
+		case '4':loadSequence(4);
+		break;
+		case '0':loadSequence(0);
+		break;
 	}
 	
 }
@@ -186,11 +210,13 @@ if( num > 0 && num <(totalNumSequence) && !sequence.isLoading() ){
 		sequence.unloadSequence();
 	}
 
+	string path = ofToString(num)+"/"+ofToString(IMGSIZE)+"/";
+
 	switch(num){
 
-		case 1: sequence.loadSequence("1/", "jpg", 1, 1959, 4);
+		case 1: sequence.loadSequence(path, "jpg", 0, 12199, 5);
 		break;
-		case 2:sequence.loadSequence("2/", "jpg", 1, 6);
+		case 2:sequence.loadSequence(path, "jpg",0, 12817, 6 );
 		break;
 		case 3:
 		break;
@@ -204,6 +230,11 @@ if( num > 0 && num <(totalNumSequence) && !sequence.isLoading() ){
 	currentSequence = num;
 	
 	
+} else if (num == 0){
+
+cout << "\n Image de demarrage" ;
+currentSequence = 0;
+
 } else {
 
 cout << "\n Not allowed to load this sequence " << ofToString(num);
@@ -218,8 +249,15 @@ void ofApp::listNumSequence(){
 	//start this function at the beggining, calculate the number of
 	//sequence, according to number of foler placed in data folder
 
+	cout<< "\n List Num Sequence : working directory";
+	cout<< ofToDataPath("", true);
+
+
 	ofDirectory dir = ofDirectory("");
 	totalNumSequence = 1;
+
+	string size = "/"+ofToString(IMGSIZE);
+	imagePresentation.load("titre"+ofToString(IMGSIZE)+".jpg");
 
 	while ( dir.doesDirectoryExist( ofToString(totalNumSequence))){
 
@@ -229,8 +267,8 @@ void ofApp::listNumSequence(){
 	for (int i = 1; i <(totalNumSequence); i++ ){
 
 		ofImage img ;
-		if( !img.load(ofToString(i)+"/intro.jpg")){
-			img.allocate(1080, 720 , OF_IMAGE_COLOR);
+		if( !img.load(ofToString(i)+size+"/intro.jpg")){
+			img.allocate(1280, 720 , OF_IMAGE_COLOR);
 		}
 		listOfVignette.push_back(img);
 	}
