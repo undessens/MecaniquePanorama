@@ -39,7 +39,7 @@
 void ofApp::setup(){
 	
 	//First of all : change the data path directory to another disk
-	ofSetDataPathRoot("/Volumes/Data/8FabLab/");
+	ofSetDataPathRoot("/media/conilux/Data/8FabLab/");
 	
 
 
@@ -85,7 +85,7 @@ void ofApp::update(){
 		// check for mouse moved message
 		if(m.getAddress() == "/transport/next" && !isLoading){
 
-			int step = m.getArgAsInt(0) + 1;
+			int step = m.getArgAsInt(0) +1;
 
 			if (indexFrame <  (sequence.getTotalFrames()-step) ){
 
@@ -98,7 +98,7 @@ void ofApp::update(){
 		}
 		if(m.getAddress() == "/transport/previous" && !isLoading){
 
-			int step = m.getArgAsInt(0) + 1;
+			int step = m.getArgAsInt(0) +1;
 
 			if( indexFrame > step){
 
@@ -111,7 +111,7 @@ void ofApp::update(){
 		}
 		if(m.getAddress() == "/transport/changeSeq" && !isLoading){
 
-			int newSeq = m.getArgAsInt(0);
+			int newSeq = m.getArgAsInt(0) ;
 
 			loadSequence(newSeq);
 
@@ -152,7 +152,7 @@ void ofApp::draw(){
 			if(playingMouse){
 				//get the frame based on the current time and draw it
 				//get the sequence frame that maps to the mouseX position
-				float percent = ofMap(mouseX, 0, ofGetWidth(), 0, 1.0, true);
+				float percent = ofMap(mouseX, 0, ofGetWidth(), 0.8, 1.0, true);
 			
 				//draw it.
 				sequence.getTextureForPercent(percent).draw(0, 0, ofGetWidth(), ofGetHeight());
@@ -214,11 +214,13 @@ if( num > 0 && num <(totalNumSequence) && !sequence.isLoading() ){
 
 	switch(num){
 
-		case 1: sequence.loadSequence(path, "jpg", 0, 12199, 5);
+		case 1: sequence.loadSequence(path, "jpg", 0, 12199, 6);
 		break;
-		case 2:sequence.loadSequence(path, "jpg",0, 12817, 6 );
+		case 2: sequence.loadSequence(path, "jpg",0, 12817, 6 );
 		break;
-		case 3:
+		case 3: sequence.loadSequence(path, "jpg",0, 12551, 6 );
+		break;
+		case 4: sequence.loadSequence(path, "jpg",0, 2049, 5 );
 		break;
 
 
