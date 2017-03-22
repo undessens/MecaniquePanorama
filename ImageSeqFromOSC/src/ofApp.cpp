@@ -39,7 +39,7 @@
 void ofApp::setup(){
 	
 	//First of all : change the data path directory to another disk
-	ofSetDataPathRoot("/Volumes/Data/8FabLab/");
+	//ofSetDataPathRoot("1/");
 	
 
 
@@ -48,6 +48,7 @@ void ofApp::setup(){
 	//this creates a method call where the parameters
 	//prefix is frame, file type is png, from frame 1 to 11, 2 digits in the number
 	receiver.setup(12345);
+    ofSetFrameRate(60);
 
 	currentSequence = 1;
 	isLoading = false;
@@ -60,7 +61,7 @@ void ofApp::setup(){
 	sequence.enableThreadedLoad(true);
 
 	listNumSequence();
-	loadSequence(0);
+	loadSequence(1);
 	
 	indexFrame = 0;
 	//sequence.preloadAllFrames();	//this way there is no stutter when loading frames
@@ -71,6 +72,8 @@ void ofApp::setup(){
 	
 	playingMouse = false; //controls if playing automatically, or controlled by the mouse
 	isFullScreen = false;
+    smoothPos = 0;
+    smoothAlpha = 0.;
 
 
 }
@@ -85,7 +88,7 @@ void ofApp::update(){
 		// check for mouse moved message
 		if(m.getAddress() == "/transport/next" && !isLoading){
 
-			int step = m.getArgAsInt(0) + 1;
+			int step = m.getArgAsInt(0) +1;
 
 			if (indexFrame <  (sequence.getTotalFrames()-step) ){
 
@@ -98,7 +101,7 @@ void ofApp::update(){
 		}
 		if(m.getAddress() == "/transport/previous" && !isLoading){
 
-			int step = m.getArgAsInt(0) + 1;
+			int step = m.getArgAsInt(0) +1;
 
 			if( indexFrame > step){
 
@@ -109,9 +112,15 @@ void ofApp::update(){
 				indexFrame = sequence.getTotalFrames();
 			}
 		}
+        if(m.getAddress() == "/transport/percent" && !isLoading){
+            
+            int pos = (1.0 - m.getArgAsFloat(0)) * ofGetWidth();
+            
+            hardPos = pos;
+        }
 		if(m.getAddress() == "/transport/changeSeq" && !isLoading){
 
-			int newSeq = m.getArgAsInt(0);
+			int newSeq = m.getArgAsInt(0) ;
 
 			loadSequence(newSeq);
 
@@ -121,6 +130,10 @@ void ofApp::update(){
 
 
 	}
+    
+    if(playingMouse) hardPos = mouseX;
+    
+    smoothPos = (1.0f-smoothAlpha)*hardPos+ (smoothAlpha)*smoothPos;
 
 
 	//loading, image presentation
@@ -149,20 +162,15 @@ void ofApp::draw(){
 		else{
 			ofBackground(0);
 			ofSetColor(255);
-			if(playingMouse){
 				//get the frame based on the current time and draw it
 				//get the sequence frame that maps to the mouseX position
-				float percent = ofMap(mouseX, 0, ofGetWidth(), 0, 1.0, true);
+				float percent = ofMap(smoothPos, 0, ofGetWidth(), 0, 1.0, true);
 			
 				//draw it.
 				sequence.getTextureForPercent(percent).draw(0, 0, ofGetWidth(), ofGetHeight());
-			}
-			else {
-
-				sequence.getTextureForFrame( indexFrame).draw(0,0,ofGetWidth(), ofGetHeight());
-				//sequence.getTextureForFrame( indexFrame).draw(0,0, ofGetWidth(), ofGetHeight());
+                //debug
+                //ofDrawBitmapString(ofToString(percent*100)+"%", ofGetWidth()/2, ofGetHeight()/2);
 				
-			}
 		}
 
 	} else {
@@ -181,6 +189,7 @@ void ofApp::keyPressed(int key){
 	switch(key){
 
 		case 'm': playingMouse = !playingMouse;
+        smoothPos = ofMap(mouseX, 0, ofGetWidth(), 0, 1.0, true);
 		break;
 		case 'f': isFullScreen = !isFullScreen;
 		ofSetFullscreen( isFullScreen);
@@ -203,22 +212,24 @@ void ofApp::keyPressed(int key){
 void ofApp::loadSequence(int num){
 
 
-if( num > 0 && num <(totalNumSequence) && !sequence.isLoading() ){
+if( num > 0 && !sequence.isLoading() ){
 	
 	if(sequence.isLoaded()){
 
 		sequence.unloadSequence();
 	}
 
-	string path = ofToString(num)+"/"+ofToString(IMGSIZE)+"/";
+	string path = ofToString(num)+"/";
 
 	switch(num){
 
-		case 1: sequence.loadSequence(path, "jpg", 0, 12199, 5);
+		case 1: sequence.loadSequence(path, "jpg", 11608, 12236, 6);
 		break;
-		case 2:sequence.loadSequence(path, "jpg",0, 12817, 6 );
+		case 2: sequence.loadSequence(path, "jpg",0, 12817, 6 );
 		break;
-		case 3:
+		case 3: sequence.loadSequence(path, "jpg",0, 12551, 6 );
+		break;
+		case 4: sequence.loadSequence(path, "jpg",0, 2049, 5 );
 		break;
 
 

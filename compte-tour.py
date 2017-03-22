@@ -96,11 +96,11 @@ if __name__ == '__main__':
 			oscMsg = OSCMessage()
 			value = ord(msg[1]) - ord("0")
 
-			if ( msg[0]== "+") :
+			if ( msg[0]== "-") :
 				oscMsg.setAddress("/transport/next")
 				oscMsg.append(value)
 				print "next frames :"+str(value)
-			elif ( msg[0] == '-') :
+			elif ( msg[0] == '+') :
 				oscMsg.setAddress("/transport/previous")
 				oscMsg.append(value)
 				print "previous frames : "+str(value)

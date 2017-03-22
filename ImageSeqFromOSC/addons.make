@@ -1,3 +1,3 @@
-ofxOsc
 ofxGui
 ofxImageSequence
+ofxOsc

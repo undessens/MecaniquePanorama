@@ -14,8 +14,10 @@
 #include "ofMain.h"
 #include "ofxImageSequence.h"
 #include "ofxOsc.h"
+#include <math.h>       /* pow */
 
 #define IMGSIZE ( 1080)
+#define EXPO (1.8f)
 
 
 
@@ -45,6 +47,9 @@ class ofApp : public ofBaseApp
 	int currentSequence;
 	bool isFullScreen;
 	int totalNumSequence;
+    float smoothPos;
+    int hardPos;
+    float smoothAlpha;
 
 
 	//Transition, image presentation
