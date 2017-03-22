@@ -39,7 +39,11 @@
 void ofApp::setup(){
 	
 	//First of all : change the data path directory to another disk
+<<<<<<< HEAD
 	//ofSetDataPathRoot("1/");
+=======
+	ofSetDataPathRoot("/media/conilux/Data/8FabLab/");
+>>>>>>> origin/master
 	
 
 
@@ -164,7 +168,11 @@ void ofApp::draw(){
 			ofSetColor(255);
 				//get the frame based on the current time and draw it
 				//get the sequence frame that maps to the mouseX position
+<<<<<<< HEAD
 				float percent = ofMap(smoothPos, 0, ofGetWidth(), 0, 1.0, true);
+=======
+				float percent = ofMap(mouseX, 0, ofGetWidth(), 0.8, 1.0, true);
+>>>>>>> origin/master
 			
 				//draw it.
 				sequence.getTextureForPercent(percent).draw(0, 0, ofGetWidth(), ofGetHeight());
@@ -223,12 +231,21 @@ if( num > 0 && !sequence.isLoading() ){
 
 	switch(num){
 
+<<<<<<< HEAD
 		case 1: sequence.loadSequence(path, "jpg", 11608, 12236, 6);
 		break;
 		case 2: sequence.loadSequence(path, "jpg",0, 12817, 6 );
 		break;
 		case 3: sequence.loadSequence(path, "jpg",0, 12551, 6 );
 		break;
+=======
+		case 1: sequence.loadSequence(path, "jpg", 0, 12199, 6);
+		break;
+		case 2: sequence.loadSequence(path, "jpg",0, 12817, 6 );
+		break;
+		case 3: sequence.loadSequence(path, "jpg",0, 12551, 6 );
+		break;
+>>>>>>> origin/master
 		case 4: sequence.loadSequence(path, "jpg",0, 2049, 5 );
 		break;
 
