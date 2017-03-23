@@ -2,10 +2,23 @@
     Mecanique Panorama
 
     Created by Aurelien Conil
-    
-simple both ways counter from a turning wheel, using
-optical IR sensor
+    github.com/undessens/mecanique_panorama
 
+
+*/
+
+/*    
+simple both ways counter from a turning wheel, using
+optical IR sensor ( pin A0, A1 ) and IR emitter A2
+
++
+
+4 buttons, used as selector
+pin 10, 11, 12, 13
++
+
+relay , turning on and off according to wheel frequency
+pin 8
 
 
 */ 
@@ -17,19 +30,24 @@ int pinSens1 = A0;
 int pinSens2 = A1;
 
 //Buttons from sequence choices
-int pinBut1 = 10;
-int pinBut2 = 11;
-int pinBut3 = 12;
-int pinBut4 = 13;
+int pinBut1 = 9;
+int pinBut2 = 10;
+int pinBut3 = 11;
+int pinBut4 = 12;
 
 //Algorithm
 int currentChoice = 0;
 boolean sens1 = false;
 boolean sens2 = false;
 boolean direction = false; //clockwise, anti-clockwise
-int count= 0;
+long int count= 0;
 unsigned long time;
 float speed;
+
+// Relay command
+boolean relayState = false;
+int pinRelay = A5;
+int relayModulo = 15;
 
 
 
@@ -42,6 +60,7 @@ void setup(){
   pinMode ( pinBut2, INPUT_PULLUP );
   pinMode ( pinBut3, INPUT_PULLUP );
   pinMode ( pinBut4, INPUT_PULLUP );
+  pinMode ( pinRelay, OUTPUT );
   
   digitalWrite(pinIR, HIGH);
   
@@ -66,9 +85,12 @@ void loop(){
    //transform speed to stay around 0 and 10
    speed = map(int(speed),0,40, 0, 10);
    if(speed > 9) speed = 9;
-   time = millis(); 
+   time = millis();
    Serial.print( "+"); 
-   Serial.println(char('0' + speed));  
+   Serial.println(char('0' + speed)); 
+
+    count --;
+    updateRelay();
    
    
   }
@@ -81,14 +103,19 @@ void loop(){
    speed = map(int(speed),0,40, 0, 10);
    if(speed > 9) speed = 9;
    time = millis(); 
+   count --;
    Serial.print("-");
    Serial.println(char('0' + speed));
+
+   updateRelay();
   }
 
   sens1 = newSens1; 
   sens2 = newSens2;
   
   updateChoiceButton();
+
+  
   
 }
 
@@ -99,15 +126,7 @@ boolean updateChoiceButton(){
   boolean newBut3 = digitalRead(pinBut3);
   boolean newBut4 = digitalRead(pinBut4);
   
-//  if(newBut1) Serial.print("1-");
-//  else Serial.print("0-");
-//  if(newBut2) Serial.print("1-");
-//  else Serial.print("0-");
-//  if(newBut3) Serial.print("1-");
-//  else Serial.print("0-");
-//  if(newBut4) Serial.println("1");
-//  else Serial.println("0");
-
+  // if no button is pressed
   if(currentChoice == 0){
      //check if any button is pressed
     
@@ -129,6 +148,10 @@ boolean updateChoiceButton(){
   else{
     
    switch(currentChoice){
+
+    /*if button is not pressed anymore, wait 400ms in changeChoice
+     *  then recheak the digital pin, using updateChoiceButton's boolean return
+     */
     
     case 1: if(!newBut1) changeChoice(0);
     break;
@@ -173,3 +196,16 @@ void changeChoice( int i ){
   }
    
 }
+
+void updateRelay(){
+
+ Serial.println(count);
+ if (count%relayModulo==0){
+
+  relayState = !relayState;
+  digitalWrite(pinRelay, relayState);
+ }
+
+
+}
+

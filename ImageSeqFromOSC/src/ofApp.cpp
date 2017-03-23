@@ -1,32 +1,15 @@
 /**
- *  ofApp.cpp
+ *  Mecanique Panorama
+ * Association Un Des Sens
+ * github.com/undessens/mecanique_panorama
  *
+ *  Inspired from
  *	ofxImageSequence example project
  *
  * Created by James George, http://www.jamesgeorge.org
  * in collaboration with FlightPhase http://www.flightphase.com
  *		- Updated for 0.8.4 by James George on 12/10/2014 for Specular (http://specular.cc) (how time flies!) 
  *
- * Permission is hereby granted, free of charge, to any person
- * obtaining a copy of this software and associated documentation
- * files (the "Software"), to deal in the Software without
- * restriction, including without limitation the rights to use,
- * copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following
- * conditions:
- *
- * The above copyright notice and this permission notice shall be
- * included in all copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
- * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
- * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
- * NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
- * HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
- * WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
- * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
- * OTHER DEALINGS IN THE SOFTWARE.
  *
  * ----------------------
  *
@@ -39,45 +22,63 @@
 void ofApp::setup(){
 	
 	//First of all : change the data path directory to another disk
-<<<<<<< HEAD
-	//ofSetDataPathRoot("1/");
-=======
+#ifdef __APPLE__
+   // ofSetDataPathRoot("1/");
+#else
 	ofSetDataPathRoot("/media/conilux/Data/8FabLab/");
->>>>>>> origin/master
-	
+#endif
 
 
-	//File format for the example frames is
-	//frame01.png 
-	//this creates a method call where the parameters
-	//prefix is frame, file type is png, from frame 1 to 11, 2 digits in the number
+    // OSC-config
 	receiver.setup(12345);
-    ofSetFrameRate(60);
+    
+    // FrameRate ?
+    //ofSetFrameRate(60);
+    
+    //Video Presentation
+    vidPresentation.load("menu.mp4");
+    vidPresentation.setLoopState(OF_LOOP_NORMAL);
+    vidPresentation.stop();
 
+    // Image sequence init
 	currentSequence = 1;
 	isLoading = false;
 	loadingDuration = 2.5;
-
-
-
-
-
 	sequence.enableThreadedLoad(true);
 
+    // Really usefull ?
 	listNumSequence();
+ #ifdef __APPLE__
 	loadSequence(1);
+#else
+    // On linux, load the menu - video presentation
+    loadSequence(0);
+#endif
 	
 	indexFrame = 0;
 	//sequence.preloadAllFrames();	//this way there is no stutter when loading frames
-
-	//sequence.loadSequence("Decoup-test-sqjpeg");
-
-	//sequence.setFrameRate(10); //set to ten frames per second for Muybridge's horse.
 	
 	playingMouse = false; //controls if playing automatically, or controlled by the mouse
 	isFullScreen = false;
     smoothPos = 0;
     smoothAlpha = 0.;
+    
+    //Blur fbo
+#ifdef TARGET_OPENGLES
+    shaderBlurX.load("shadersES2/shaderBlurX");
+    shaderBlurY.load("shadersES2/shaderBlurY");
+#else
+    if(ofIsGLProgrammableRenderer()){
+        shaderBlurX.load("shadersGL3/shaderBlurX");
+        shaderBlurY.load("shadersGL3/shaderBlurY");
+    }else{
+        shaderBlurX.load("shadersGL2/shaderBlurX");
+        shaderBlurY.load("shadersGL2/shaderBlurY");
+    }
+#endif
+    fboBlurOnePass.allocate(1920, 1080);
+    fboBlurTwoPass.allocate(1920, 1080);
+    blur = 3.0f;
 
 
 }
@@ -140,12 +141,22 @@ void ofApp::update(){
     smoothPos = (1.0f-smoothAlpha)*hardPos+ (smoothAlpha)*smoothPos;
 
 
-	//loading, image presentation
+	//loading, image presentation ( currentSequence > 0 )
 	loadingTime = ofGetElapsedTimef() - loadingStartTime;
-	if(loadingTime > loadingDuration){
+	
+    //if(loadingTime > loadingDuration){
+    if(blur < 0.3 ){
 
 		isLoading = false;
 	}
+    else{
+        blur = blur * 0.995;
+    }
+    
+    //Video presentation
+    if (currentSequence == 0 ){
+        vidPresentation.update();
+    }
 
 
 
@@ -157,33 +168,69 @@ void ofApp::draw(){
 	
 	if ( currentSequence > 0){
 
-		if(sequence.isLoading() || isLoading){
-			ofBackground(255,0,0);
-			ofSetColor(255);
-			listOfVignette[currentSequence-1].draw(0,0,ofGetWidth(), ofGetHeight());
+		
 
-		}
-		else{
+		
+		
 			ofBackground(0);
 			ofSetColor(255);
 				//get the frame based on the current time and draw it
 				//get the sequence frame that maps to the mouseX position
-<<<<<<< HEAD
-				float percent = ofMap(smoothPos, 0, ofGetWidth(), 0, 1.0, true);
-=======
-				float percent = ofMap(mouseX, 0, ofGetWidth(), 0.8, 1.0, true);
->>>>>>> origin/master
+
+				float percent = ofMap(mouseX, 0, ofGetWidth(), 0.0, 1.0, true);
 			
 				//draw it.
-				sequence.getTextureForPercent(percent).draw(0, 0, ofGetWidth(), ofGetHeight());
+            //----------------------------------------------------------
+            fboBlurOnePass.begin();
+            
+            shaderBlurX.begin();
+            shaderBlurX.setUniform1f("blurAmnt", blur);
+            
+            sequence.getTextureForPercent(percent).draw(0, 0, ofGetWidth(), ofGetHeight());
+            
+            shaderBlurX.end();
+            
+            fboBlurOnePass.end();
+            
+            //----------------------------------------------------------
+            fboBlurTwoPass.begin();
+            
+            shaderBlurY.begin();
+            shaderBlurY.setUniform1f("blurAmnt", blur);
+            
+            fboBlurOnePass.draw(0, 0);
+            
+            shaderBlurY.end();
+            
+            fboBlurTwoPass.end();
+            
+            //----------------------------------------------------------
+            ofSetColor(ofColor::white);
+            fboBlurTwoPass.draw(0, 0);
+				
+            //sequence.getTextureForPercent(percent).
+            ofFbo myfbo;
                 //debug
                 //ofDrawBitmapString(ofToString(percent*100)+"%", ofGetWidth()/2, ofGetHeight()/2);
+        
+        
+        if(sequence.isLoading() || isLoading){
+            //ofBackground(255,0,0);
+            ofSetColor(255);
+            ofEnableAlphaBlending();
+            listOfVignette[currentSequence-1].draw(0,0,ofGetWidth(), ofGetHeight());
+            ofDisableAlphaBlending();
+            
+        }
 				
-		}
+		
 
 	} else {
-		// Image de presentation
-		imagePresentation.draw(0,0);
+		// Image  presentation
+		//imagePresentation.draw(0,0);
+        
+        // Video presentation
+        vidPresentation.draw(0, 0);
 
 	}
 
@@ -231,23 +278,14 @@ if( num > 0 && !sequence.isLoading() ){
 
 	switch(num){
 
-<<<<<<< HEAD
+
 		case 1: sequence.loadSequence(path, "jpg", 11608, 12236, 6);
 		break;
 		case 2: sequence.loadSequence(path, "jpg",0, 12817, 6 );
 		break;
 		case 3: sequence.loadSequence(path, "jpg",0, 12551, 6 );
 		break;
-=======
-		case 1: sequence.loadSequence(path, "jpg", 0, 12199, 6);
-		break;
-		case 2: sequence.loadSequence(path, "jpg",0, 12817, 6 );
-		break;
-		case 3: sequence.loadSequence(path, "jpg",0, 12551, 6 );
-		break;
->>>>>>> origin/master
-		case 4: sequence.loadSequence(path, "jpg",0, 2049, 5 );
-		break;
+
 
 
 	}
@@ -256,12 +294,15 @@ if( num > 0 && !sequence.isLoading() ){
 	loadingStartTime = ofGetElapsedTimef();
 	isLoading = true;
 	currentSequence = num;
+    blur = 30.0f;
 	
 	
 } else if (num == 0){
 
 cout << "\n Image de demarrage" ;
-currentSequence = 0;
+    currentSequence = 0;
+    vidPresentation.firstFrame();
+    vidPresentation.play();
 
 } else {
 
@@ -287,6 +328,7 @@ void ofApp::listNumSequence(){
 	string size = "/"+ofToString(IMGSIZE);
 	imagePresentation.load("titre"+ofToString(IMGSIZE)+".jpg");
 
+
 	while ( dir.doesDirectoryExist( ofToString(totalNumSequence))){
 
 		totalNumSequence++;
@@ -295,7 +337,9 @@ void ofApp::listNumSequence(){
 	for (int i = 1; i <(totalNumSequence); i++ ){
 
 		ofImage img ;
-		if( !img.load(ofToString(i)+size+"/intro.jpg")){
+        //if( !img.load(ofToString(i)+size+"/intro.png")){
+
+		if( !img.load(ofToString(i)+"/intro.png")){
 			img.allocate(1280, 720 , OF_IMAGE_COLOR);
 		}
 		listOfVignette.push_back(img);

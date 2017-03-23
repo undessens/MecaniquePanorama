@@ -53,7 +53,7 @@ if __name__ == '__main__':
 	#Serial connect
 	try:
 		if sys.platform.startswith('darwin'):
-			ser = serial.Serial((serial_ports())[0],115200)
+			ser = serial.Serial((serial_ports())[1],115200)
 		elif sys.platform.startswith('linux') or sys.platform.startswith('cygwin'):
 			ser = serial.Serial('/dev/ttyACM0',115200)
 			#ser = serial.Serial('/dev/ttyACM1', 115200)

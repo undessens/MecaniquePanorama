@@ -59,5 +59,16 @@ class ofApp : public ofBaseApp
 	bool isLoading;
 	vector<ofImage> listOfVignette;
 	ofImage imagePresentation;
+    ofVideoPlayer vidPresentation;
+    
+    //Blur fbo
+    ofShader shaderBlurX;
+    ofShader shaderBlurY;
+    
+    ofFbo fboBlurOnePass;
+    ofFbo fboBlurTwoPass;
+    
+    float blur;
+    
 };
 
