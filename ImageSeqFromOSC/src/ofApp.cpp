@@ -36,7 +36,7 @@ void ofApp::setup(){
     //ofSetFrameRate(60);
     
     //Video Presentation
-    vidPresentation.load("menu.mp4");
+    vidPresentation.load("intro.mp4");
     vidPresentation.setLoopState(OF_LOOP_NORMAL);
     vidPresentation.stop();
 
@@ -56,7 +56,7 @@ void ofApp::setup(){
 #endif
 	
 	indexFrame = 0;
-	//sequence.preloadAllFrames();	//this way there is no stutter when loading frames
+	sequence.preloadAllFrames();	//this way there is no stutter when loading frames
 	
 	playingMouse = false; //controls if playing automatically, or controlled by the mouse
 	isFullScreen = false;
@@ -78,7 +78,7 @@ void ofApp::setup(){
 #endif
     fboBlurOnePass.allocate(1920, 1080);
     fboBlurTwoPass.allocate(1920, 1080);
-    blur = 3.0f;
+    blur = 0.0f;
 
 
 }
@@ -91,7 +91,7 @@ void ofApp::update(){
 		receiver.getNextMessage(&m);
         
 		// check for mouse moved message
-		if(m.getAddress() == "/transport/next" && !isLoading){
+		if(m.getAddress() == "/transport/next"){
 
 			int step = m.getArgAsInt(0) +1;
 
@@ -104,7 +104,7 @@ void ofApp::update(){
 				indexFrame = 0;
 			}
 		}
-		if(m.getAddress() == "/transport/previous" && !isLoading){
+		if(m.getAddress() == "/transport/previous"){
 
 			int step = m.getArgAsInt(0) +1;
 
@@ -123,7 +123,7 @@ void ofApp::update(){
             
             hardPos = pos;
         }
-		if(m.getAddress() == "/transport/changeSeq" && !isLoading){
+		if(m.getAddress() == "/transport/changeSeq" ){
 
 			int newSeq = m.getArgAsInt(0) ;
 
@@ -144,14 +144,16 @@ void ofApp::update(){
 	//loading, image presentation ( currentSequence > 0 )
 	loadingTime = ofGetElapsedTimef() - loadingStartTime;
 	
-    //if(loadingTime > loadingDuration){
-    if(blur < 0.3 ){
+    if(loadingTime > loadingDuration){
+	    if(blur < 0.3 ){
 
-		isLoading = false;
+			isLoading = false;
+			blur = 0;
+		}
+	    else{
+	        blur = blur * 0.993;
+	    }
 	}
-    else{
-        blur = blur * 0.995;
-    }
     
     //Video presentation
     if (currentSequence == 0 ){
@@ -177,17 +179,22 @@ void ofApp::draw(){
 				//get the frame based on the current time and draw it
 				//get the sequence frame that maps to the mouseX position
 
-				float percent = ofMap(mouseX, 0, ofGetWidth(), 0.0, 1.0, true);
-			
+			float percent = ofMap(mouseX, 0, ofGetWidth(), 0.0, 1.0, true);
 				//draw it.
             //----------------------------------------------------------
+			
             fboBlurOnePass.begin();
             
             shaderBlurX.begin();
             shaderBlurX.setUniform1f("blurAmnt", blur);
             
+            if(playingMouse){
             sequence.getTextureForPercent(percent).draw(0, 0, ofGetWidth(), ofGetHeight());
-            
+            }
+            else{
+            sequence.getTextureForFrame(indexFrame).draw(0, 0, ofGetWidth(), ofGetHeight());	
+            }
+
             shaderBlurX.end();
             
             fboBlurOnePass.end();
@@ -205,11 +212,10 @@ void ofApp::draw(){
             fboBlurTwoPass.end();
             
             //----------------------------------------------------------
-            ofSetColor(ofColor::white);
+            //sequence.getTextureForFrame(indexFrame).draw(0, 0);
             fboBlurTwoPass.draw(0, 0);
 				
             //sequence.getTextureForPercent(percent).
-            ofFbo myfbo;
                 //debug
                 //ofDrawBitmapString(ofToString(percent*100)+"%", ofGetWidth()/2, ofGetHeight()/2);
         
@@ -218,7 +224,7 @@ void ofApp::draw(){
             //ofBackground(255,0,0);
             ofSetColor(255);
             ofEnableAlphaBlending();
-            listOfVignette[currentSequence-1].draw(0,0,ofGetWidth(), ofGetHeight());
+            listOfVignette[currentSequence-1].draw(0,0);
             ofDisableAlphaBlending();
             
         }
@@ -230,7 +236,7 @@ void ofApp::draw(){
 		//imagePresentation.draw(0,0);
         
         // Video presentation
-        vidPresentation.draw(0, 0);
+        vidPresentation.draw(0, 0, ofGetWidth(), ofGetHeight());
 
 	}
 
@@ -266,35 +272,37 @@ void ofApp::keyPressed(int key){
 //--------------------------------------------------------------
 void ofApp::loadSequence(int num){
 
-
-if( num > 0 && !sequence.isLoading() ){
+if( num > 0 ){
+//if( num > 0 && !sequence.isLoading() ){
 	
 	if(sequence.isLoaded()){
 
 		sequence.unloadSequence();
-	}
+  }
+  
 
 	string path = ofToString(num)+"/";
 
 	switch(num){
 
 
-		case 1: sequence.loadSequence(path, "jpg", 11608, 12236, 6);
+		case 1: sequence.loadSequence(path, "jpg", 0, 10352, 6);
 		break;
-		case 2: sequence.loadSequence(path, "jpg",0, 12817, 6 );
+		case 2: sequence.loadSequence(path, "jpg",0, 13261, 6 );
 		break;
-		case 3: sequence.loadSequence(path, "jpg",0, 12551, 6 );
+		case 3: sequence.loadSequence(path, "jpg",0, 12947, 6 );
 		break;
-
+		case 4: sequence.loadSequence(path, "jpg",0, 12551, 6 );
 
 
 	}
-
+	sequence.preloadAllFrames();
 	loadingTime = 0;
 	loadingStartTime = ofGetElapsedTimef();
 	isLoading = true;
 	currentSequence = num;
-    blur = 30.0f;
+    blur = 2.0f;
+    cout << "\n  load this sequence " << ofToString(num);
 	
 	
 } else if (num == 0){

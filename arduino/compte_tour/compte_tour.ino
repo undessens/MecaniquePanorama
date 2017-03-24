@@ -40,7 +40,7 @@ int currentChoice = 0;
 boolean sens1 = false;
 boolean sens2 = false;
 boolean direction = false; //clockwise, anti-clockwise
-long int count= 0;
+long long int count= 0;
 unsigned long time;
 float speed;
 
@@ -199,11 +199,15 @@ void changeChoice( int i ){
 
 void updateRelay(){
 
- Serial.println(count);
+
  if (count%relayModulo==0){
 
-  relayState = !relayState;
-  digitalWrite(pinRelay, relayState);
+  //relayState = !relayState;
+  //digitalWrite(pinRelay, relayState);
+  digitalWrite(pinRelay, HIGH); 
+ }
+  else{
+   digitalWrite(pinRelay,LOW); 
  }
 
 
