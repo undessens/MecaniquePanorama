@@ -149,17 +149,20 @@ boolean updateChoiceButton(){
     
    switch(currentChoice){
 
-    /*if button is not pressed anymore, wait 400ms in changeChoice
-     *  then recheak the digital pin, using updateChoiceButton's boolean return
+    /*if button is not pressed anymore, 
+    1) Wait 120 ms as a security, avoid "fantom" release
+    2)Wait 400ms in changeChoice
+       then recheak the digital pin, using updateChoiceButton's boolean return
      */
+    delay(120);
     
-    case 1: if(!newBut1) changeChoice(0);
+    case 1: if(!newBut1 && !digitalRead(pinBut1)) changeChoice(0);
     break;
-    case 2: if(!newBut2) changeChoice(0);
+    case 2: if(!newBut2 && !digitalRead(pinBut2)) changeChoice(0);
     break;
-    case 3: if(!newBut3) changeChoice(0);
+    case 3: if(!newBut3 && !digitalRead(pinBut3)) changeChoice(0);
     break;
-    case 4: if(!newBut4) changeChoice(0);
+    case 4: if(!newBut4 && !digitalRead(pinBut4)) changeChoice(0);
     break;
     
    } 

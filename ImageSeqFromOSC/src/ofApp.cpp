@@ -9,12 +9,13 @@
  * Created by James George, http://www.jamesgeorge.org
  * in collaboration with FlightPhase http://www.flightphase.com
  *		- Updated for 0.8.4 by James George on 12/10/2014 for Specular (http://specular.cc) (how time flies!) 
- *
- *
- * ----------------------
- *
- * simple ofxImageSequence example using Muybridge horse
+ * 
  */
+
+
+
+// C'est ici Arnaud qu'il faut changer les valeurs.
+
 
 #include "ofApp.h"
 
@@ -25,7 +26,8 @@ void ofApp::setup(){
 #ifdef __APPLE__
    // ofSetDataPathRoot("1/");
 #else
-	ofSetDataPathRoot("/media/conilux/Data/8FabLab/");
+	//ofSetDataPathRoot("/mnt/Data/8fablab");
+	ofSetDataPathRoot("/media/conilux/a1b9dd27-c02d-4740-8f81-17bbcff4cf1e");
 #endif
 
 
@@ -224,7 +226,7 @@ void ofApp::draw(){
             //ofBackground(255,0,0);
             ofSetColor(255);
             ofEnableAlphaBlending();
-            listOfVignette[currentSequence-1].draw(0,0);
+            listOfVignette[currentSequence-1].draw(0,0, ofGetWidth(), ofGetHeight());
             ofDisableAlphaBlending();
             
         }
@@ -278,21 +280,23 @@ if( num > 0 ){
 	if(sequence.isLoaded()){
 
 		sequence.unloadSequence();
-  }
-  
+  }		
+    if(num > totalNumSequence){
+    	num = totalNumSequence;
+    }
 
 	string path = ofToString(num)+"/";
 
 	switch(num){
 
 
-		case 1: sequence.loadSequence(path, "jpg", 0, 10352, 6);
+		case 1: sequence.loadSequence(path, "jpg", 0, listOfNbImage[0], 6);
 		break;
-		case 2: sequence.loadSequence(path, "jpg",0, 13261, 6 );
+		case 2: sequence.loadSequence(path, "jpg",0, listOfNbImage[1], 6 );
 		break;
-		case 3: sequence.loadSequence(path, "jpg",0, 12947, 6 );
+		case 3: sequence.loadSequence(path, "jpg",0, listOfNbImage[2], 6 );
 		break;
-		case 4: sequence.loadSequence(path, "jpg",0, 12551, 6 );
+		case 4: sequence.loadSequence(path, "jpg",0, listOfNbImage[3], 6 );
 
 
 	}
@@ -323,18 +327,18 @@ cout << "\n Not allowed to load this sequence " << ofToString(num);
 
 //--------------------------------------------------------------
 void ofApp::listNumSequence(){
-	//start this function at the beggining, calculate the number of
+	//start this function at the beggi·ning, calculate the number of
 	//sequence, according to number of foler placed in data folder
 
 	cout<< "\n List Num Sequence : working directory";
 	cout<< ofToDataPath("", true);
-
+	cout<< "\n";
 
 	ofDirectory dir = ofDirectory("");
 	totalNumSequence = 1;
 
 	string size = "/"+ofToString(IMGSIZE);
-	imagePresentation.load("titre"+ofToString(IMGSIZE)+".jpg");
+	//imagePresentation.load("titre"+ofToString(IMGSIZE)+".jpg");
 
 
 	while ( dir.doesDirectoryExist( ofToString(totalNumSequence))){
@@ -345,6 +349,17 @@ void ofApp::listNumSequence(){
 	for (int i = 1; i <(totalNumSequence); i++ ){
 
 		ofImage img ;
+		ofDirectory dirOfSeq = ofDirectory(ofToString(i));
+		int nbImage = dirOfSeq.listDir() - 2;
+		
+		cout<< "\n Folder nb :";
+		cout << ofToString(i);
+	    cout<< "\n nb of Image : ";
+	    cout<< ofToString(nbImage);
+		
+		listOfNbImage.push_back(nbImage);
+
+
         //if( !img.load(ofToString(i)+size+"/intro.png")){
 
 		if( !img.load(ofToString(i)+"/intro.png")){

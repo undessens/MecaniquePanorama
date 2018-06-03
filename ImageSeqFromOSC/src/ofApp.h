@@ -58,6 +58,7 @@ class ofApp : public ofBaseApp
 	float loadingDuration;
 	bool isLoading;
 	vector<ofImage> listOfVignette;
+	vector<int> listOfNbImage;
 	ofImage imagePresentation;
     ofVideoPlayer vidPresentation;
     
