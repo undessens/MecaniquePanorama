@@ -14,9 +14,6 @@
 
 
 
-// C'est ici Arnaud qu'il faut changer les valeurs.
-
-
 #include "ofApp.h"
 
 //--------------------------------------------------------------
@@ -25,6 +22,14 @@ void ofApp::setup(){
 	//First of all : change the data path directory to another disk
 #ifdef __APPLE__
    // ofSetDataPathRoot("1/");
+#elif _WIN32
+	filesystem::path mydatapath = "E:/mecaniquePanorama/";
+	dir = ofDirectory(mydatapath);
+	cout << "\n original directory : " + dir.getOriginalDirectory();
+	cout << "\n nb file : " + ofToString(dir.listDir()) + "\n";
+	ofSetDataPathRoot(mydatapath);
+	
+	
 #else
 	//ofSetDataPathRoot("/mnt/Data/8fablab");
 	ofSetDataPathRoot("/media/conilux/a1b9dd27-c02d-4740-8f81-17bbcff4cf1e");
@@ -38,7 +43,9 @@ void ofApp::setup(){
     //ofSetFrameRate(60);
     
     //Video Presentation
-    vidPresentation.load("intro.mp4");
+
+	cout << "\n chargement video " + dir.getAbsolutePath() + "/intro.mp4\n";
+    vidPresentation.load(path("intro.mp4"));
     vidPresentation.setLoopState(OF_LOOP_NORMAL);
     vidPresentation.stop();
 
@@ -67,15 +74,15 @@ void ofApp::setup(){
     
     //Blur fbo
 #ifdef TARGET_OPENGLES
-    shaderBlurX.load("shadersES2/shaderBlurX");
-    shaderBlurY.load("shadersES2/shaderBlurY");
+    shaderBlurX.load(path("shadersES2/shaderBlurX"));
+    shaderBlurY.load(path("shadersES2/shaderBlurY"));
 #else
     if(ofIsGLProgrammableRenderer()){
-        shaderBlurX.load("shadersGL3/shaderBlurX");
-        shaderBlurY.load("shadersGL3/shaderBlurY");
+        shaderBlurX.load(path("shadersGL3/shaderBlurX"));
+        shaderBlurY.load(path("shadersGL3/shaderBlurY"));
     }else{
-        shaderBlurX.load("shadersGL2/shaderBlurX");
-        shaderBlurY.load("shadersGL2/shaderBlurY");
+        shaderBlurX.load(path("shadersGL2/shaderBlurX"));
+        shaderBlurY.load(path("shadersGL2/shaderBlurY"));
     }
 #endif
     fboBlurOnePass.allocate(1920, 1080);
@@ -285,18 +292,18 @@ if( num > 0 ){
     	num = totalNumSequence;
     }
 
-	string path = ofToString(num)+"/";
+	string folderPath = path(ofToString(num)) +"/";
 
 	switch(num){
 
 
-		case 1: sequence.loadSequence(path, "jpg", 0, listOfNbImage[0], 6);
+		case 1: sequence.loadSequence(folderPath, "jpg", 0, listOfNbImage[0], 6);
 		break;
-		case 2: sequence.loadSequence(path, "jpg",0, listOfNbImage[1], 6 );
+		case 2: sequence.loadSequence(folderPath, "jpg",0, listOfNbImage[1], 6 );
 		break;
-		case 3: sequence.loadSequence(path, "jpg",0, listOfNbImage[2], 6 );
+		case 3: sequence.loadSequence(folderPath, "jpg",0, listOfNbImage[2], 6 );
 		break;
-		case 4: sequence.loadSequence(path, "jpg",0, listOfNbImage[3], 6 );
+		case 4: sequence.loadSequence(folderPath, "jpg",0, listOfNbImage[3], 6 );
 
 
 	}
@@ -330,31 +337,48 @@ void ofApp::listNumSequence(){
 	//start this function at the beggi·ning, calculate the number of
 	//sequence, according to number of foler placed in data folder
 
-	cout<< "\n List Num Sequence : working directory";
-	cout<< ofToDataPath("", true);
-	cout<< "\n";
+	cout<< "\n *** List Num Sequence : working directory : "+dir.getAbsolutePath()+"\n";
+	totalNumSequence = 0;
 
-	ofDirectory dir = ofDirectory("");
-	totalNumSequence = 1;
 
-	string size = "/"+ofToString(IMGSIZE);
+	/*
+	std::vector<ofFile> listOfFiles = dir.getFiles();
+	cout << "\n *** List of files **** \n";
+	cout << "\n numFiles " + ofToString(dir.numFiles()) + "\n";
+
+	for (std::vector<ofFile>::iterator it = listOfFiles.begin(); it != listOfFiles.end(); ++it) {
+		ofFile f = *it;
+		cout << "\n"+ f.getFileName();
+	}
+	*/
+	
+
+
+	//string size = "/"+ofToString(IMGSIZE);
 	//imagePresentation.load("titre"+ofToString(IMGSIZE)+".jpg");
 
+	dir.listDir();
+	for (int i = 1; i < 20; i++) {
 
-	while ( dir.doesDirectoryExist( ofToString(totalNumSequence))){
+		if (dir.doesDirectoryExist(path(ofToString(i)))){
+			totalNumSequence++;
+		}
 
-		totalNumSequence++;
 	}
+	
 
-	for (int i = 1; i <(totalNumSequence); i++ ){
+
+	cout << "\n NUM OF SEQUENCE = " + ofToString(totalNumSequence)+"\n";
+
+	for (int i = 1; i <(totalNumSequence+1); i++ ){
 
 		ofImage img ;
-		ofDirectory dirOfSeq = ofDirectory(ofToString(i));
+		ofDirectory dirOfSeq = ofDirectory(path(ofToString(i)));
 		int nbImage = dirOfSeq.listDir() - 2;
 		
 		cout<< "\n Folder nb :";
 		cout << ofToString(i);
-	    cout<< "\n nb of Image : ";
+	    cout<< " nb of Image : ";
 	    cout<< ofToString(nbImage);
 		
 		listOfNbImage.push_back(nbImage);
@@ -362,15 +386,22 @@ void ofApp::listNumSequence(){
 
         //if( !img.load(ofToString(i)+size+"/intro.png")){
 
-		if( !img.load(ofToString(i)+"/intro.png")){
+		if( !img.load(dirOfSeq.getAbsolutePath()+"/intro.png")){
 			img.allocate(1280, 720 , OF_IMAGE_COLOR);
 		}
 		listOfVignette.push_back(img);
 	}
 
-	cout<< "\n nb of sequence :" << ofToString(totalNumSequence);
+	cout << "\n end of scanning files \n ";
 
 
+}
+
+//--------------------------------------------------------------
+// This function replace ofSetDataPathRoot, which is not working on windows with a change of disk form C: to D:
+string ofApp::path(string p) {
+
+	return dir.getAbsolutePath() + "/" + p;
 }
 
 

@@ -39,8 +39,10 @@ def serial_ports():
         try:
             s = serial.Serial(port)
             s.close()
+            print "Serial found in "+port
             result.append(port)
-        except (OSError, serial.SerialException):
+        except :
+            #print "probleme ouverture serial : "+port
             pass
     return result
 
@@ -57,6 +59,8 @@ if __name__ == '__main__':
 		elif sys.platform.startswith('linux') or sys.platform.startswith('cygwin'):
 			ser = serial.Serial('/dev/ttyACM0',115200)
 			#ser = serial.Serial('/dev/ttyACM1', 115200)
+		elif sys.platform.startswith('win'):
+			ser = serial.Serial('COM4',115200)
 		else:
 			ser = None
 	except :

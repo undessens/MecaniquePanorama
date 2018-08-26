@@ -51,6 +51,9 @@ class ofApp : public ofBaseApp
     int hardPos;
     float smoothAlpha;
 
+	//Directory management
+	ofDirectory dir;
+	string path(string);
 
 	//Transition, image presentation
 	float loadingTime;
