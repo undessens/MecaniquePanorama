@@ -56,15 +56,16 @@ void ofApp::setup(){
 	sequence.enableThreadedLoad(true);
 
     // Really usefull ?
+	cout << "\n list Num Frames ";
 	listNumSequence();
- #ifdef __APPLE__
-	loadSequence(1);
-#else
-    // On linux, load the menu - video presentation
-    loadSequence(0);
-#endif
+
+	//Presentation video
+	cout << "\n Load sequence 0 ";
+	loadSequence(0);
+
 	
 	indexFrame = 0;
+	cout << "\n preload all frames ";
 	sequence.preloadAllFrames();	//this way there is no stutter when loading frames
 	
 	playingMouse = false; //controls if playing automatically, or controlled by the mouse

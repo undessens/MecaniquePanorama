@@ -37,12 +37,12 @@ def serial_ports():
     result = []
     for port in ports:
         try:
-            s = serial.Serial(port)
+            s = serial.Serial(port,115200)
             s.close()
             print "Serial found in "+port
             result.append(port)
         except :
-            #print "probleme ouverture serial : "+port
+            print "probleme ouverture serial : "+port
             pass
     return result
 
@@ -50,7 +50,10 @@ def serial_ports():
 if __name__ == '__main__':
 
 	#Serial print port available
-	print serial_ports()
+	serialNames = serial_ports()
+	print "liste des ports serial"
+	print serialNames
+
 
 	#Serial connect
 	try:
@@ -60,7 +63,7 @@ if __name__ == '__main__':
 			ser = serial.Serial('/dev/ttyACM0',115200)
 			#ser = serial.Serial('/dev/ttyACM1', 115200)
 		elif sys.platform.startswith('win'):
-			ser = serial.Serial('COM4',115200)
+			ser = serial.Serial(serialNames[0],115200)
 		else:
 			ser = None
 	except :
