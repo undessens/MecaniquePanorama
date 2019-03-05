@@ -50,7 +50,12 @@ void ofApp::setup(){
     vidPresentation.stop();
     
     // Load xml file from directory scanning
-    XML.load(dir.getAbsolutePath() + "/scan.xml");
+	if (XML.load(dir.getAbsolutePath() + "/scan.xml")) {
+		cout << "\n chargement du fichier XML ";
+	}
+	else {
+		cout << "\n ERREUR du fichier XML ";
+	}
     
 
     // Image sequence init
@@ -375,13 +380,15 @@ void ofApp::listNumSequence(){
 
 	cout << "\n NUM OF SEQUENCE = " + ofToString(totalNumSequence)+"\n";
 
+	XML.pushTag("SCAN");
+
 	for (int i = 1; i <(totalNumSequence+1); i++ ){
 
 		ofImage img ;
 		// scanning files from OF is extremely long
         ofDirectory dirOfSeq = ofDirectory(path(ofToString(i)));
 		//int nbImage = dirOfSeq.listDir() - 2;
-        int nbImage = XML.getValue("SCAN:SEQ:NBFILES", 0, i);
+        int nbImage = XML.getValue("SEQ:NBFILES", 0, i-1);
 		
 		cout<< "\n Folder nb :";
 		cout << ofToString(i);
