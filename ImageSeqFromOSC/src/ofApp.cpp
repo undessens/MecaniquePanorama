@@ -21,7 +21,7 @@ void ofApp::setup(){
 	
 	//First of all : change the data path directory to another disk
 #ifdef __APPLE__
-   // ofSetDataPathRoot("1/");
+    ofSetDataPathRoot("");
 #elif _WIN32
 	filesystem::path mydatapath = "E:/mecaniquePanorama/";
 	dir = ofDirectory(mydatapath);
@@ -48,6 +48,10 @@ void ofApp::setup(){
     vidPresentation.load(path("intro.mp4"));
     vidPresentation.setLoopState(OF_LOOP_NORMAL);
     vidPresentation.stop();
+    
+    // Load xml file from directory scanning
+    XML.load(dir.getAbsolutePath() + "/scan.xml");
+    
 
     // Image sequence init
 	currentSequence = 1;
@@ -374,8 +378,10 @@ void ofApp::listNumSequence(){
 	for (int i = 1; i <(totalNumSequence+1); i++ ){
 
 		ofImage img ;
-		ofDirectory dirOfSeq = ofDirectory(path(ofToString(i)));
-		int nbImage = dirOfSeq.listDir() - 2;
+		// scanning files from OF is extremely long
+        ofDirectory dirOfSeq = ofDirectory(path(ofToString(i)));
+		//int nbImage = dirOfSeq.listDir() - 2;
+        int nbImage = XML.getValue("SCAN:SEQ:NBFILES", 0, i);
 		
 		cout<< "\n Folder nb :";
 		cout << ofToString(i);

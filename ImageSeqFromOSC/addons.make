@@ -1,3 +1,5 @@
 ofxGui
 ofxImageSequence
+ofxOpenCv
 ofxOsc
+ofxXmlSettings

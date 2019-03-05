@@ -15,6 +15,8 @@
 #include "ofxImageSequence.h"
 #include "ofxOsc.h"
 #include <math.h>       /* pow */
+#include "ofxXmlSettings.h"
+
 
 #define IMGSIZE ( 1080)
 #define EXPO (1.8f)
@@ -52,6 +54,7 @@ class ofApp : public ofBaseApp
     float smoothAlpha;
 
 	//Directory management
+    ofxXmlSettings XML;
 	ofDirectory dir;
 	string path(string);
 
