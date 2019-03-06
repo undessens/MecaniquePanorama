@@ -16,9 +16,10 @@
 #include "ofxOsc.h"
 #include <math.h>       /* pow */
 #include "ofxXmlSettings.h"
+#include "ofxQuadWarp.h"
 
-
-#define IMGSIZE ( 1080)
+#define IMGSIZEW ( 1280)
+#define IMGSIZEH ( 800)
 #define EXPO (1.8f)
 
 
@@ -65,8 +66,13 @@ class ofApp : public ofBaseApp
 	bool isLoading;
 	vector<ofImage> listOfVignette;
 	vector<int> listOfNbImage;
+    vector<int> listOfStartImage;
+    vector<int> listOfNbDigit;
 	ofImage imagePresentation;
     ofVideoPlayer vidPresentation;
+    
+    //Quad Warping
+    ofxQuadWarp warper;
     
     //Blur fbo
     ofShader shaderBlurX;
