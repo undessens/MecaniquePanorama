@@ -102,14 +102,8 @@ void ofApp::setup(){
     blur = 0.0f;
     
     //QuadWarp
-    warper.setSourceRect(ofRectangle(0, 0, IMGSIZEW, IMGSIZEH));
-    warper.setTopLeftCornerPosition(ofPoint(0, 0));             // this is position of the quad warp corners, centering the image on the screen.
-    warper.setTopRightCornerPosition(ofPoint(IMGSIZEW, 0));        // this is position of the quad warp corners, centering the image on the screen.
-    warper.setBottomLeftCornerPosition(ofPoint(0,IMGSIZEH));      // this is position of the quad warp corners, centering the image on the screen.
-    warper.setBottomRightCornerPosition(ofPoint(IMGSIZEW, IMGSIZEH)); // this is position of the quad warp corners, centering the image on the screen.
-    warper.setup();
-    warper.load("warp.xml"); // reload last saved changes.
-    warper.hide();
+	warper.setup(0, 0, IMGSIZEW, IMGSIZEH);
+	warper.activate();
     
     
 
@@ -200,6 +194,8 @@ void ofApp::update(){
 //--------------------------------------------------------------
 void ofApp::draw(){
 	
+	ofBackground(0);
+
 	if ( currentSequence > 0){
 
 			ofBackground(0);
@@ -236,11 +232,12 @@ void ofApp::draw(){
             //----------------------------------------------------------
             //sequence.getTextureForFrame(indexFrame).draw(0, 0);
             // Draw with QuadWarper
-            ofMatrix4x4 mat = warper.getMatrix();
-            ofPushMatrix();
-            ofMultMatrix(mat);
+			warper.begin();
             fboBlurTwoPass.draw(0, 0);
-            ofPopMatrix();
+			if (warper.isActive()) {
+				warper.draw();
+			}
+			warper.end();
 				
             //debug
             //ofDrawBitmapString(ofToString(percent*100)+"%", ofGetWidth()/2, ofGetHeight()/2);
@@ -260,23 +257,15 @@ void ofApp::draw(){
     else
     {
 		// Video  presentation
-        vidPresentation.draw(0, 0, ofGetWidth(), ofGetHeight());
+		warper.begin();
+		vidPresentation.draw(0, 0, ofGetWidth(), ofGetHeight());
+		if (warper.isActive()) {
+			warper.draw();
+		}
+		warper.end();
+        
 	}
     
-    //----------------------------------------
-    //draw quad warp ui.
-    
-    ofSetColor(ofColor::magenta);
-    warper.drawQuadOutline();
-    
-    ofSetColor(ofColor::yellow);
-    warper.drawCorners();
-    
-    ofSetColor(ofColor::magenta);
-    warper.drawHighlightedCorner();
-    
-    ofSetColor(ofColor::red);
-    warper.drawSelectedCorner();
 
 
 }
@@ -293,10 +282,13 @@ void ofApp::keyPressed(int key){
 		case 'f': isFullScreen = !isFullScreen;
 		ofSetFullscreen( isFullScreen);
 		break;
-        case 'w':warper.toggleShow();
-            if(!warper.isShowing()){
-                warper.save("warp.xml");
-            }
+        case 'w':
+			if (warper.isActive()) {
+				warper.deactivate();
+			}
+			else {
+				warper.activate();
+			}
         break;
 		case '1':loadSequence(1);
 		break;

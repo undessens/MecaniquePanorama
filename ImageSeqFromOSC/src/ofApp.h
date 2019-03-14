@@ -16,8 +16,7 @@
 #include "ofxOsc.h"
 #include <math.h>       /* pow */
 #include "ofxXmlSettings.h"
-#include "ofxQuadWarp.h"
-
+#include "ofxGLWarper.h"
 #define IMGSIZEW ( 1280)
 #define IMGSIZEH ( 800)
 #define EXPO (1.8f)
@@ -72,7 +71,7 @@ class ofApp : public ofBaseApp
     ofVideoPlayer vidPresentation;
     
     //Quad Warping
-    ofxQuadWarp warper;
+    ofxGLWarper warper;
     
     //Blur fbo
     ofShader shaderBlurX;

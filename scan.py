@@ -18,7 +18,7 @@ if __name__ == '__main__':
 
 	path_MP = ""
 	if sys.platform.startswith('win'):
-		path_MP = "truc"
+		path_MP = "E:/mecaniquePanorama"
 	elif sys.platform.startswith('darwin'):
 		path_MP = "/Users/aurelienconil/Documents/of_v0.9.8_osx_release/apps/mecaniquePanorama/ImageSeqFromOSC/bin/data"
 

@@ -1,6 +1,6 @@
+ofxGLWarper
 ofxGui
 ofxImageSequence
 ofxOpenCv
 ofxOsc
-ofxQuadWarp
 ofxXmlSettings
