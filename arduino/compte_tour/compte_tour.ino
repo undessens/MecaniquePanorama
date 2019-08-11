@@ -207,12 +207,11 @@ void updateRelay(){
 
   //relayState = !relayState;
   //digitalWrite(pinRelay, relayState);
-  digitalWrite(pinRelay, HIGH); 
+  digitalWrite(pinRelay, LOW); 
  }
   else{
-   digitalWrite(pinRelay,LOW); 
+   digitalWrite(pinRelay,HIGH); 
  }
 
 
 }
-

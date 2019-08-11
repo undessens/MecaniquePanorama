@@ -65,8 +65,10 @@ if __name__ == '__main__':
 			" File : intro.png    !!!  DON'T EXIST !!!"
 			nbImage = nbFiles 
 		
-		listOfFirst.append(listOfFiles[0])
+		#listOfFirst.append(listOfFiles[0])
+		listOfFirst.append("000000.jpg")
 		numberOfFirst = int(listOfFirst[x].split(".")[0])
+		
 		print "1st image : " +listOfFirst[x]+ " number : "+str(numberOfFirst)
 
 		# Digit calculation
@@ -115,7 +117,7 @@ if __name__ == '__main__':
 			nbDigit.text = listOfFirst[x].split(".")[0]
 
 		mydata = ET.tostring(scan)
-		myfile = open(path_MP+"/scanNONO.xml", "w"	)
+		myfile = open(path_MP+"/scan.xml", "w"	)
 		myfile.write(mydata)
 
 
