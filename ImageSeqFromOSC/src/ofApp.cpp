@@ -25,7 +25,8 @@ void ofApp::setup(){
     dir = ofDirectory(mydatapath);
     ofSetDataPathRoot(mydatapath);
 #elif _WIN32
-	filesystem::path mydatapath = "E:/mecaniquePanorama/";
+	filesystem::path mydatapath = "E:/MecaniquePanorama/";
+	//filesystem::path mydatapath = "C:/Users/Aurelien/Documents/OPENFRAMEWORKS/of_v0.10.0_vs2017_release/apps/MecaniquePanorama/ImageSeqFromOSC/bin/data/";
 	dir = ofDirectory(mydatapath);
 	ofSetDataPathRoot(mydatapath);
 #else
@@ -42,12 +43,24 @@ void ofApp::setup(){
 	receiver.setup(12345);
     
     // FrameRate ?
-    //ofSetFrameRate(60);
+    ofSetFrameRate(30);
+	isPrintFps = false;
     
     //Video Presentation
 
-	cout << "\n chargement video " + dir.getAbsolutePath() + "/intro.mp4\n";
-    vidPresentation.load(path("intro.mp4"));
+	cout << "\n chargement video " + dir.getAbsolutePath() + "intro.mp4\n";
+	string absouluteVideoPath = path("intro.mp4");
+	ofFile myFile;
+	if (myFile.doesFileExist(absouluteVideoPath, false)) {
+		cout << " Le fichier video existe\n ";
+	}
+
+	vidPresentation.load(absouluteVideoPath);
+	//vidPresentation.load("intro.mp4");
+	if (!vidPresentation.isLoaded()) {
+		cout << "\n Erreur chargement video : path : ";
+		cout << vidPresentation.getMoviePath() + "\n";
+	}
     vidPresentation.setLoopState(OF_LOOP_NORMAL);
     vidPresentation.stop();
     
@@ -61,30 +74,48 @@ void ofApp::setup(){
     
 
     // Image sequence init
-	currentSequence = 1;
+	currentSequence = 0;
 	isLoading = false;
-	loadingDuration = 2.5;
-	sequence.enableThreadedLoad(true);
+	loadingDuration = 2;
+	
+	/*******************************
+	Load threaded load ( only using preload frames )
+	********************************/
+	//sequence.enableThreadedLoad(true);
+	sequence.enableThreadedLoad(false);
 
-    // Really usefull ?
+	/*******************************
+	List Num Sequence ( 2nd security with scan.xml that list all sequences )
+	********************************/
 	cout << "\n list Num Frames ";
 	listNumSequence();
 
-	//Presentation video
+	/*******************************
+	Load sequence 0 ( conflict with arduino that start sequence 1 at start )
+	********************************/
 	cout << "\n Load sequence 0 ";
 	loadSequence(0);
 
-	
+	/*******************************
+	Screen saver 
+	********************************/
+	screenSaverTime = 0;
+
+	/*******************************
+	index frame = 0
+	********************************/
 	indexFrame = 0;
-	cout << "\n preload all frames ";
-	sequence.preloadAllFrames();	//this way there is no stutter when loading frames
 	
+	/*******************************
+	Mouse playing : not used
+	********************************/
 	playingMouse = false; //controls if playing automatically, or controlled by the mouse
-	isFullScreen = false;
     smoothPos = 0;
     smoothAlpha = 0.;
     
-    //Blur fbo
+	/*******************************
+	Blur fbo
+	********************************/
 #ifdef TARGET_OPENGLES
     shaderBlurX.load(path("shadersES2/shaderBlurX"));
     shaderBlurY.load(path("shadersES2/shaderBlurY"));
@@ -101,7 +132,9 @@ void ofApp::setup(){
     fboBlurTwoPass.allocate(IMGSIZEW, IMGSIZEH);
     blur = 0.0f;
     
-    //QuadWarp
+	/*******************************
+	Quad warper
+	********************************/
 	warper.setup(0, 0, IMGSIZEW, IMGSIZEH);
 	warper.activate();
     
@@ -111,77 +144,78 @@ void ofApp::setup(){
 
 //--------------------------------------------------------------
 void ofApp::update(){
+	
+	/*******************************
+	OSC receive message
+	********************************/
 	while(receiver.hasWaitingMessages()){
 		// get the next message
 		ofxOscMessage m;
 		receiver.getNextMessage(&m);
+
+		//Reset screen saver when osc message is received
+		screenSaverTime = ofGetElapsedTimef();
         
 		// check for mouse moved message
 		if(m.getAddress() == "/transport/next"){
 
 			int step = m.getArgAsInt(0) +1;
-
 			if (indexFrame <  (sequence.getTotalFrames()-step) ){
-
 				indexFrame+=step;
 			}
 			else{
-
 				indexFrame = 0;
 			}
 		}
 		if(m.getAddress() == "/transport/previous"){
 
 			int step = m.getArgAsInt(0) +1;
-
 			if( indexFrame > step){
-
 				indexFrame-=step;
 			}
 			else{
-
 				indexFrame = sequence.getTotalFrames();
 			}
+			
 		}
         if(m.getAddress() == "/transport/percent" && !isLoading){
-            
             int pos = (1.0 - m.getArgAsFloat(0)) * ofGetWidth();
-            
             hardPos = pos;
         }
 		if(m.getAddress() == "/transport/changeSeq" ){
-
-			int newSeq = m.getArgAsInt(0) ;
-
+			int newSeq = m.getArgAsInt(0);
 			loadSequence(newSeq);
-
-
-
 		}
-
-
 	}
-    
-    if(playingMouse) hardPos = mouseX;
-    
-    smoothPos = (1.0f-smoothAlpha)*hardPos+ (smoothAlpha)*smoothPos;
 
+	/******************************************************************
+	Update Screen saver : #define SCREEN_SAVER (350)
+	********************************************************************/
+	if ((ofGetElapsedTimef() - screenSaverTime) > SCREEN_SAVER) {
+		loadSequence(0);
+	}
 
-	//loading, image presentation ( currentSequence > 0 )
+	/******************************************************************
+	Update Loading time ( blur amount + title image ( intro.png ) )
+	********************************************************************/
 	loadingTime = ofGetElapsedTimef() - loadingStartTime;
-	
+
+	/******************************************************************
+	Update blur amount ( initiated in loadSequence() ), then decreased here
+	********************************************************************/
     if(loadingTime > loadingDuration){
 	    if(blur < 0.3 ){
-
 			isLoading = false;
 			blur = 0;
 		}
 	    else{
-	        blur = blur * 0.993;
+	        blur = blur * 0.98;
 	    }
 	}
     
-    //Video presentation
+	/**********************************************************
+	If no sequence ( sequence = 0 ), update video presentation
+	*************************************************************/	
     if (currentSequence == 0 ){
         vidPresentation.update();
     }
@@ -196,56 +230,71 @@ void ofApp::draw(){
 	
 	ofBackground(0);
 
+	/***********************************
+	 Images sequence is actually playing
+	**********************************/
 	if ( currentSequence > 0){
 
-			ofBackground(0);
-			ofSetColor(255);
-				//get the frame based on the current time and draw it
-				//get the sequence frame that maps to the mouseX position
-
-			float percent = ofMap(mouseX, 0, ofGetWidth(), 0.0, 1.0, true);
-				//draw it.
-            //----------------------------------------------------------
+		ofBackground(0);
+		ofSetColor(255);
 			
-            fboBlurOnePass.begin();
-            shaderBlurX.begin();
-            shaderBlurX.setUniform1f("blurAmnt", blur);
+
+		/***********************************
+			Draw : 1 . Fbo blur 1st pass
+		**********************************/
+        fboBlurOnePass.begin();
+        shaderBlurX.begin();
+        shaderBlurX.setUniform1f("blurAmnt", blur);
         
-            // Drawing Sequence
-            if(playingMouse){
-                sequence.getTextureForPercent(percent).draw(0, 0, ofGetWidth(), ofGetHeight());
-            }
-            else{
-                sequence.getTextureForFrame(indexFrame).draw(0, 0, ofGetWidth(), ofGetHeight());
-            }
-            shaderBlurX.end();
-            fboBlurOnePass.end();
+		/**************************************************
+			Draw : 2 . Draw sequence from mouse or index frame
+		***************************************************/
+        if(playingMouse){
+			float percent = ofMap(mouseX, 0, ofGetWidth(), 0.0, 1.0, true);
+			sequence.getTextureForPercent(percent).draw(0, 0, IMGSIZEW, IMGSIZEH);
+        }
+        else{
+            sequence.getTextureForFrame(indexFrame).draw(0, 0, IMGSIZEW, IMGSIZEH);
+        }
+        shaderBlurX.end();
+        fboBlurOnePass.end();
             
-            //----------------------------------------------------------
-            fboBlurTwoPass.begin();
-            shaderBlurY.begin();
-            shaderBlurY.setUniform1f("blurAmnt", blur);
-            fboBlurOnePass.draw(0, 0);
-            shaderBlurY.end();
-            fboBlurTwoPass.end();
+		/***********************************
+			Draw : 3 . Fbo blur 2nd pass
+		********************************/
+        fboBlurTwoPass.begin();
+        shaderBlurY.begin();
+        shaderBlurY.setUniform1f("blurAmnt", blur);
+        fboBlurOnePass.draw(0, 0);
+        shaderBlurY.end();
+        fboBlurTwoPass.end();
             
-            //----------------------------------------------------------
-            //sequence.getTextureForFrame(indexFrame).draw(0, 0);
-            // Draw with QuadWarper
-			warper.begin();
-            fboBlurTwoPass.draw(0, 0);
-			if (warper.isActive()) {
-				warper.draw();
-			}
-			warper.end();
-				
-            //debug
-            //ofDrawBitmapString(ofToString(percent*100)+"%", ofGetWidth()/2, ofGetHeight()/2);
-        
-        // draw intro.png file during loading
-        if(sequence.isLoading() || isLoading){
+		/***********************************
+			Draw : 4 . Draw fbo inside quad warper
+		********************************/
+		warper.begin();
+		fboBlurTwoPass.draw(0, 0, ofGetWidth(), ofGetHeight());
+		/***********************************
+			Draw : 5 . Draw warper corner if needed
+		********************************/
+		if (warper.isActive()) {
+			warper.draw();
+		}
+		/***********************************
+			Draw : 6 . Draw FPS if needed
+		********************************/
+		if (isPrintFps) {
+			string fps = "fps: " + ofToString(ofGetFrameRate());
+			ofDrawBitmapStringHighlight(fps, ofVec2f(ofGetWidth() / 2, ofGetHeight() / 2), ofColor::black, ofColor::white);
+			ofDrawBitmapStringHighlight(ofToString(indexFrame), ofVec2f(ofGetWidth() / 2, (ofGetHeight() / 2) - 25), ofColor::black, ofColor::white);
+		}
+	
+		warper.end();
+		/***********************************
+			Draw : 7 . Draw FPS image title if needed
+		********************************/
+        if(isLoading){
             
-            //ofBackground(255,0,0);
             ofSetColor(255);
             ofEnableAlphaBlending();
             listOfVignette[currentSequence-1].draw(0,0, ofGetWidth(), ofGetHeight());
@@ -256,7 +305,9 @@ void ofApp::draw(){
 	}
     else
     {
-		// Video  presentation
+		/******************************************************
+		If no sequence ( sequence = 0 ), draw video presentation
+		********************************************************/
 		warper.begin();
 		vidPresentation.draw(0, 0, ofGetWidth(), ofGetHeight());
 		if (warper.isActive()) {
@@ -274,13 +325,15 @@ void ofApp::draw(){
 void ofApp::keyPressed(int key){
 	//hit any key to toggle playing
 
+	//Reset screen saver when key is pressed
+	screenSaverTime = ofGetElapsedTimef();
+
 	switch(key){
 
 		case 'm': playingMouse = !playingMouse;
         smoothPos = ofMap(mouseX, 0, ofGetWidth(), 0, 1.0, true);
 		break;
-		case 'f': isFullScreen = !isFullScreen;
-		ofSetFullscreen( isFullScreen);
+		case 'f': isPrintFps = !isPrintFps;
 		break;
         case 'w':
 			if (warper.isActive()) {
@@ -298,6 +351,8 @@ void ofApp::keyPressed(int key){
 		break;
 		case '4':loadSequence(4);
 		break;
+		case '5':loadSequence(5);
+		break;
 		case '0':loadSequence(0);
 		break;
 	}
@@ -307,44 +362,68 @@ void ofApp::keyPressed(int key){
 //--------------------------------------------------------------
 void ofApp::loadSequence(int num){
 
-    if( num > 0 ){
+	/**************************
+		Load an sequence of images
+	***************************/
+	if( num > 0 ){
         
         if(sequence.isLoaded()){
+			sequence.cancelLoad();
             sequence.unloadSequence();
         }
         if(num > totalNumSequence){
             num = totalNumSequence;
         }
 
-        string folderPath = path(ofToString(num)) +"/";
+		/**************************
+		Choose the folder of images
+		***************************/
+        string folderPath = path(ofToString(num)) +"/processed/";
+		//string folderPath = path(ofToString(num)) + "/";
 
-        sequence.loadSequence(folderPath,
-                              "jpg",
+		/**************************
+		Choose Extension
+		***************************/
+		sequence.loadSequence(folderPath,
+                              //"jpg",
+							   "png",
                               listOfStartImage[num-1],
                               listOfStartImage[num-1] + listOfNbImage[num-1],
                               listOfNbDigit[num-1]);
 
- 
-        sequence.preloadAllFrames();
+		
+        /**************************
+		This preload all frame in an other thread if :sequence.enableThreadedLoad(true);
+		***************************/
+		//sequence.preloadAllFrames();
+
         loadingTime = 0;
         loadingStartTime = ofGetElapsedTimef();
         isLoading = true;
         currentSequence = num;
         blur = 2.0f;
         cout << "\n  load this sequence " << ofToString(num);
+		if (sequence.isLoading()) {
+			cout << "  Actually Loading \n " << ofToString(num);
+		}
+		else {
+			cout << "  Error, not loading \n " << ofToString(num);
+		}
         
         
-    } // Starting presentation
+    } 
+	/**************************
+		Video presentation ( sequence 0 )
+	***************************/
     else if (num == 0){
 
-    cout << "\n Image de demarrage" ;
-        currentSequence = 0;
-        vidPresentation.firstFrame();
-        vidPresentation.play();
+		cout << "\n Image de demarrage" ;
+			currentSequence = 0;
+			vidPresentation.firstFrame();
+			vidPresentation.play();
+		} else {
 
-    } else {
-
-    cout << "\n Not allowed to load this sequence " << ofToString(num);
+		cout << "\n Not allowed to load this sequence " << ofToString(num);
 
     }
 

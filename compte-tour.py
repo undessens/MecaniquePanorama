@@ -63,7 +63,9 @@ if __name__ == '__main__':
 			ser = serial.Serial('/dev/ttyACM0',115200)
 			#ser = serial.Serial('/dev/ttyACM1', 115200)
 		elif sys.platform.startswith('win'):
-			ser = serial.Serial(serialNames[0],115200)
+			serialId=1
+			print("connection au Serial Windows : "+serialNames[serialId])
+			ser = serial.Serial(serialNames[serialId],115200)
 		else:
 			ser = None
 	except :
@@ -105,11 +107,13 @@ if __name__ == '__main__':
 			
 			if ( msg[0]== "-") :
 				oscMsg.setAddress("/transport/next")
-				oscMsg.append(value*(value/2))
+				#oscMsg.append(value*(value/4))
+				oscMsg.append(value)
 				print "next frames :"+str(value)
 			elif ( msg[0] == '+') :
 				oscMsg.setAddress("/transport/previous")
-				oscMsg.append(value*(value/2))
+				#oscMsg.append(value*(value/4))
+				oscMsg.append(value) 
 				print "previous frames : "+str(value)
 			elif (msg[0] == 's'):
 				#change Sequence
@@ -121,6 +125,6 @@ if __name__ == '__main__':
 			except Exception, e:
 				print e
 			
-		time.sleep(0.01)
+		time.sleep(0.008)
 
 

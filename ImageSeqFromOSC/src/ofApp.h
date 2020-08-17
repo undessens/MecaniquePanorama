@@ -17,9 +17,10 @@
 #include <math.h>       /* pow */
 #include "ofxXmlSettings.h"
 #include "ofxGLWarper.h"
-#define IMGSIZEW ( 1280)
-#define IMGSIZEH ( 800)
+#define IMGSIZEW (1920)
+#define IMGSIZEH (1080)
 #define EXPO (1.8f)
+#define SCREEN_SAVER (350)
 
 
 
@@ -52,6 +53,7 @@ class ofApp : public ofBaseApp
     float smoothPos;
     int hardPos;
     float smoothAlpha;
+	bool isPrintFps;
 
 	//Directory management
     ofxXmlSettings XML;
@@ -79,6 +81,9 @@ class ofApp : public ofBaseApp
     
     ofFbo fboBlurOnePass;
     ofFbo fboBlurTwoPass;
+
+	//Screen saver
+	long double screenSaverTime;
     
     float blur;
     
