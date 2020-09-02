@@ -19,23 +19,28 @@
 //--------------------------------------------------------------
 void ofApp::setup(){
 	
+	cout << "PRINT YOUR CURRENT OS : \n";
 	//First of all : change the data path directory to another disk
 #ifdef __APPLE__
+	cout << "MAC OS CONFIGURATION \n";
     const string mydatapath = "/Users/aurelienconil/Documents/of_v0.9.8_osx_release/apps/mecaniquePanorama/ImageSeqFromOSC/bin/data";
     dir = ofDirectory(mydatapath);
     ofSetDataPathRoot(mydatapath);
 #elif _WIN32
+	cout << "WINDOWS CONFIGURATION \n";
 	filesystem::path mydatapath = "E:/MecaniquePanorama/";
 	//filesystem::path mydatapath = "C:/Users/Aurelien/Documents/OPENFRAMEWORKS/of_v0.10.0_vs2017_release/apps/MecaniquePanorama/ImageSeqFromOSC/bin/data/";
 	dir = ofDirectory(mydatapath);
 	ofSetDataPathRoot(mydatapath);
 #else
-	//ofSetDataPathRoot("/mnt/Data/8fablab");
-	ofSetDataPathRoot("/media/conilux/a1b9dd27-c02d-4740-8f81-17bbcff4cf1e");
+	cout << "LINUX CONFIGURATION \n";	
+	const string mydatapath = "/media/nano/FAT32/MecaniquePanorama/";
+ 	dir = ofDirectory(mydatapath);
+	ofSetDataPathRoot(mydatapath);
 #endif
     
     //Out the current directory
-    cout << "\n original directory : " + dir.getOriginalDirectory();
+    cout << "\n Directory of MP data ( video + image ) : " + dir.getOriginalDirectory();
     cout << "\n nb file : " + ofToString(dir.listDir()) + "\n";
 
 
@@ -48,8 +53,9 @@ void ofApp::setup(){
     
     //Video Presentation
 
-	cout << "\n chargement video " + dir.getAbsolutePath() + "intro.mp4\n";
+	
 	string absouluteVideoPath = path("intro.mp4");
+	cout << "\n chargement video " + absouluteVideoPath ;
 	ofFile myFile;
 	if (myFile.doesFileExist(absouluteVideoPath, false)) {
 		cout << " Le fichier video existe\n ";
@@ -378,15 +384,16 @@ void ofApp::loadSequence(int num){
 		/**************************
 		Choose the folder of images
 		***************************/
-        string folderPath = path(ofToString(num)) +"/processed/";
-		//string folderPath = path(ofToString(num)) + "/";
+       		// string folderPath = path(ofToString(num)) +"/processed/";
+		string folderPath = path(ofToString(num)) + "/";
 
 		/**************************
 		Choose Extension
 		***************************/
 		sequence.loadSequence(folderPath,
                               //"jpg",
-							   "png",
+				//			   "png",
+				"tiff",
                               listOfStartImage[num-1],
                               listOfStartImage[num-1] + listOfNbImage[num-1],
                               listOfNbDigit[num-1]);
