@@ -17,8 +17,8 @@
 #include <math.h>       /* pow */
 #include "ofxXmlSettings.h"
 #include "ofxGLWarper.h"
-#define IMGSIZEW (1280)
-#define IMGSIZEH (720)
+#define IMGSIZEW (1920)
+#define IMGSIZEH (1080)
 #define EXPO (1.8f)
 #define SCREEN_SAVER (350)
 
@@ -41,6 +41,7 @@ class ofApp : public ofBaseApp
 	void windowResized(int w, int h);
 	void loadSequence( int i);
 	void listNumSequence();
+	void loadCurrentImage();
 	
 	ofxImageSequence sequence;
 	ofImage background;
@@ -48,6 +49,7 @@ class ofApp : public ofBaseApp
 	ofxOscReceiver receiver;
 	bool playingMouse;
 	int indexFrame;
+	int lastIndexFrame;
 	int currentSequence;
 	bool isFullScreen;
 	int totalNumSequence;

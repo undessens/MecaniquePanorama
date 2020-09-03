@@ -172,6 +172,8 @@ void ofApp::update(){
 			else{
 				indexFrame = 0;
 			}
+			
+			
 		}
 		if(m.getAddress() == "/transport/previous"){
 
@@ -182,6 +184,7 @@ void ofApp::update(){
 			else{
 				indexFrame = sequence.getTotalFrames();
 			}
+			
 			
 		}
         if(m.getAddress() == "/transport/percent" && !isLoading){
@@ -257,13 +260,16 @@ void ofApp::draw(){
 		***************************************************/
         if(playingMouse){
 			float percent = ofMap(mouseX, 0, ofGetWidth(), 0.0, 1.0, true);
-            int index = sequence.getFrameIndexAtPercent(percent);
-            string filename = sequence.filenames[index];
-            currentImg.load(filename);
+            indexFrame = sequence.getFrameIndexAtPercent(percent);
+            if(indexFrame==0 || indexFrame != lastIndexFrame)  loadCurrentImage();
             currentImg.draw(0, 0, IMGSIZEW, IMGSIZEH);
+	    lastIndexFrame = indexFrame;
         }
         else{
-            sequence.getTextureForFrame(indexFrame).draw(0, 0, IMGSIZEW, IMGSIZEH);
+            //sequence.getTextureForFrame(indexFrame).draw(0, 0, IMGSIZEW, IMGSIZEH);
+		if(indexFrame==0 || indexFrame != lastIndexFrame) loadCurrentImage();
+	    currentImg.draw(0, 0, IMGSIZEW, IMGSIZEH);
+		lastIndexFrame = indexFrame;
         }
         shaderBlurX.end();
         fboBlurOnePass.end();
@@ -396,7 +402,7 @@ void ofApp::loadSequence(int num){
 		sequence.loadSequence(folderPath,
                               //"jpg",
 				//			   "png",
-				"tiff",
+				"tif",
                               listOfStartImage[num-1],
                               listOfStartImage[num-1] + listOfNbImage[num-1],
                               listOfNbDigit[num-1]);
@@ -411,6 +417,8 @@ void ofApp::loadSequence(int num){
         loadingStartTime = ofGetElapsedTimef();
         isLoading = true;
         currentSequence = num;
+	indexFrame = 0;
+	lastIndexFrame = 0;
         blur = 2.0f;
         cout << "\n  load this sequence " << ofToString(num);
 		if (sequence.isLoading()) {
@@ -438,6 +446,12 @@ void ofApp::loadSequence(int num){
     }
 
 
+}
+
+//--------------------------------------------------------------
+void ofApp::loadCurrentImage(){
+	string filename = sequence.filenames[indexFrame];
+            currentImg.load(filename);
 }
 
 //--------------------------------------------------------------

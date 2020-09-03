@@ -6,7 +6,7 @@ import glob
 from OSC import OSCClient, OSCMessage
 
 #OS choose ofApp working directory
-os.chdir('ImageSeqFromOSC/')
+#os.chdir('ImageSeqFromOSC/')
 
 def lauch_app():
 	
@@ -49,6 +49,7 @@ def serial_ports():
 
 if __name__ == '__main__':
 
+	#time.sleep(10)
 	#Serial print port available
 	serialNames = serial_ports()
 	print "liste des ports serial"
