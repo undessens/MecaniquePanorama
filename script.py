@@ -16,6 +16,8 @@ def start_app():
 	print("========= START OF APP======")
 	if sys.platform.startswith('darwin'):
 		cmd = [mpPath+"/"+ofAppName+"/bin/"+ofAppName+"Debug.app/Contents/MacOS/"+ofAppName+"Debug"]
+	elif sys.platform.startswith('win'):
+		cmd = [os.path.join(mpPath, ofAppName, 'bin', ofAppName+'.exe')]
 	print("launch : ")
 	print(cmd)
 	subprocess.Popen(cmd)
@@ -24,10 +26,14 @@ def start_app():
 
 def kill_app():
 	print("========= KILL OF APP ======")
-	path = mpPath+"/script/"
+	path = os.path.join(mpPath, "script")
 	os.chdir(path)
 	print("Path is "+path)
-	subprocess.call(['./quit_app.sh'])
+	if sys.platform.startswith('win'):
+		subprocess.call([r'quit_app.bat'])
+	else:
+		subprocess.call(['./quit_app.sh'])
+	
 
 def serial_ports():
     """ Lists serial port names
@@ -73,7 +79,7 @@ if __name__ == '__main__':
 	global ofAppName
 	ofAppName = "ImageSeqFromOSC"
 	if sys.platform.startswith('win'):
-		mpPath = "C:/Documents/Openframeworks/blabla"
+		mpPath = os.path.join('C:',os.sep,'Users','Aurelien', 'Documents', 'OPENFRAMEWORKS', 'of_v0.10.0_vs2017_release', 'apps', 'MecaniquePanorama')
 	elif sys.platform.startswith('linux') or sys.platform.startswith('cygwin'):
 		# this excludes your current terminal "/dev/tty"
 		mpPath = "/home/nano/Dev/of/apps/MecaniquePanorama/"

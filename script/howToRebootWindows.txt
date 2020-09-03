@@ -1,0 +1,7 @@
+
+Alternately the following code can be used for immediate shutdown.
+SHUTDOWN /p
+
+Here is the code to reboot a computer.
+SHUTDOWN -r -t 10
+This is the code to reboot the computer in 10 seconds.
