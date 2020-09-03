@@ -23,7 +23,7 @@ void ofApp::setup(){
 	//First of all : change the data path directory to another disk
 #ifdef __APPLE__
 	cout << "MAC OS CONFIGURATION \n";
-    const string mydatapath = "/Users/aurelienconil/Documents/of_v0.9.8_osx_release/apps/mecaniquePanorama/ImageSeqFromOSC/bin/data";
+    const string mydatapath = "/Volumes/FAT32/MecaniquePanorama";
     dir = ofDirectory(mydatapath);
     ofSetDataPathRoot(mydatapath);
 #elif _WIN32
@@ -257,7 +257,10 @@ void ofApp::draw(){
 		***************************************************/
         if(playingMouse){
 			float percent = ofMap(mouseX, 0, ofGetWidth(), 0.0, 1.0, true);
-			sequence.getTextureForPercent(percent).draw(0, 0, IMGSIZEW, IMGSIZEH);
+            int index = sequence.getFrameIndexAtPercent(percent);
+            string filename = sequence.filenames[index];
+            currentImg.load(filename);
+            currentImg.draw(0, 0, IMGSIZEW, IMGSIZEH);
         }
         else{
             sequence.getTextureForFrame(indexFrame).draw(0, 0, IMGSIZEW, IMGSIZEH);

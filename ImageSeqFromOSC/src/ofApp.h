@@ -44,6 +44,7 @@ class ofApp : public ofBaseApp
 	
 	ofxImageSequence sequence;
 	ofImage background;
+    ofImage currentImg;
 	ofxOscReceiver receiver;
 	bool playingMouse;
 	int indexFrame;
