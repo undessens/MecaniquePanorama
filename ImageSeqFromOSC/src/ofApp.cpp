@@ -50,6 +50,7 @@ void ofApp::setup(){
     // FrameRate ?
     ofSetFrameRate(30);
 	isPrintFps = false;
+	isTestMode = false;
     
     //Video Presentation
 
@@ -230,6 +231,21 @@ void ofApp::update(){
     }
 
 
+	/**********************************************************
+	Test mode. Increase frame one by one to test the real performance
+	*************************************************************/
+
+	if (currentSequence > 0 && isTestMode) {
+		if (indexFrame < sequence.getTotalFrames()) {
+			indexFrame++;
+		}
+		else {
+			indexFrame = 0;
+		}
+	}
+		
+		
+
 
 
 }
@@ -350,6 +366,8 @@ void ofApp::keyPressed(int key){
 		break;
 		case 'f': isPrintFps = !isPrintFps;
 		break;
+		case 't': isTestMode = !isTestMode;
+			break;
         case 'w':
 			if (warper.isActive()) {
 				warper.deactivate();
@@ -400,9 +418,9 @@ void ofApp::loadSequence(int num){
 		Choose Extension
 		***************************/
 		sequence.loadSequence(folderPath,
-                              //"jpg",
-				//			   "png",
-				"tif",
+                              "jpg",
+							  // "png",
+				//"tif",
                               listOfStartImage[num-1],
                               listOfStartImage[num-1] + listOfNbImage[num-1],
                               listOfNbDigit[num-1]);

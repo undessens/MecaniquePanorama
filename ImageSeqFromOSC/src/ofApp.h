@@ -57,6 +57,7 @@ class ofApp : public ofBaseApp
     int hardPos;
     float smoothAlpha;
 	bool isPrintFps;
+	bool isTestMode;
 
 	//Directory management
     ofxXmlSettings XML;
