@@ -121,46 +121,66 @@ if __name__ == '__main__':
 	param = []
 	msg = []
 
-	start_app()
-	time.sleep(10)
-	kill_app()
+	#start_app()
+	#time.sleep(10)
+	#kill_app()
 
 
 
 	while 1 :
-		
-		if(ser):
-			msg = (ser.readline())
-		else :	
-			msg = ""
 
+		isMessage = False
+		finalValue = -1000
+		while ser.in_waiting:
 
-		if (len(msg)>1):
+			if(ser):
+				msg = (ser.readline())
+			else :	
+				msg = ""
 
+			if (len(msg)>1):
 
-			oscMsg = OSCMessage()
-			value = ord(msg[1]) - ord("0")
-			
-			if ( msg[0]== "-") :
-				oscMsg.setAddress("/transport/next")
-				#oscMsg.append(value*(value/4))
-				oscMsg.append(value)
-				print "next frames :"+str(value)
-			elif ( msg[0] == '+') :
-				oscMsg.setAddress("/transport/previous")
-				#oscMsg.append(value*(value/4))
-				oscMsg.append(value) 
-				print "previous frames : "+str(value)
-			elif (msg[0] == 's'):
-				#change Sequence
-				oscMsg.setAddress("/transport/changeSeq")
-				oscMsg.append(value)
-				print "change Sequence:"+str(value)
+				oscMsg = OSCMessage()
+				value = ord(msg[1]) - ord("0")
+				
+				if ( msg[0]== "-") :
+					if finalValue == -1000:
+						finalValue = -1
+					#oscMsg.setAddress("/transport/next")
+					#oscMsg.append(value*(value/4))
+					#oscMsg.append(value)
+					finalValue -= value
+					isMessage = True
+					#print "next frames :"+str(value)
+				elif ( msg[0] == '+') :
+					if finalValue == -1000:
+						finalValue = 1
+					#oscMsg.setAddress("/transport/previous")
+					#oscMsg.append(value*(value/4))
+					#oscMsg.append(value) 
+					finalValue += value
+					isMessage = True
+					#print "previous frames : "+str(value)
+				#elif (msg[0] == 's'):
+					#change Sequence
+					#oscMsg.setAddress("/transport/changeSeq")
+					#oscMsg.append(value)
+					#isMessage = True
+					#print "change Sequence:"+str(value)
+				
+		if(isMessage ):
 			try:
+				if(finalValue>0):
+					oscMsg.setAddress("/transport/next")
+					print "next frames :"+str(finalValue)
+				else:
+					oscMsg.setAddress("/transport/previous")
+					print "previous frames : "+str(finalValue)
+				oscMsg.append(finalValue)
 				client.send(oscMsg)
 			except Exception, e:
-				print e
-			
-		time.sleep(0.008)
+				print e	
+		
+		time.sleep(0.04)
 
 
