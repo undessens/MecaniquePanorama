@@ -12,10 +12,12 @@ def getImgPaths(_path):
 
 # set folders
 
-for i in range(5):
+for i in range(1):
 
-    folderToProcess = "E:/MecaniquePanorama/"+str(i+1)
-    folderToPopulate = "E:/MecaniquePanorama/"+str(i+1)+"/processed/"
+    #folderToProcess = "E:/MecaniquePanorama/"+str(i+1)
+    folderToProcess = "/Volumes/FAT32/MecaniquePanorama/"+str(i+1)
+    #folderToPopulate = "E:/MecaniquePanorama/"+str(i+1)+"/processed/"
+    folderToPopulate = "/Volumes/FAT32/MecaniquePanorama/"+str(i+1)+"-png/"
     fileNames = getImgPaths(folderToProcess)
     filesListFull = [folderToProcess + "/" + f for f in fileNames]
 
@@ -28,7 +30,8 @@ for i in range(5):
 
 
         # compress
-        ffmpegCmd = "ffmpeg.exe -i {}  {}".format(file, fileProcessed)
+        #ffmpegCmd = "ffmpeg.exe -i {}  {}".format(file, fileProcessed)
+        ffmpegCmd = "ffmpeg -i {}  {}".format(file, fileProcessed)
         print(ffmpegCmd)
         os.system(ffmpegCmd)
 

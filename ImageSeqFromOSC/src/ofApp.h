@@ -17,6 +17,7 @@
 #include <math.h>       /* pow */
 #include "ofxXmlSettings.h"
 #include "ofxGLWarper.h"
+#include "ofxProfiler.h"
 #define IMGSIZEW (1920)
 #define IMGSIZEH (1080)
 #define EXPO (1.8f)
@@ -44,6 +45,7 @@ class ofApp : public ofBaseApp
 	void loadCurrentImage();
 	
 	ofxImageSequence sequence;
+    ofTexture imageTexture;
 	ofImage background;
     ofImage currentImg;
 	ofxOscReceiver receiver;

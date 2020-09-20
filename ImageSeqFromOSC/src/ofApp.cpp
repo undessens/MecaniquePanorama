@@ -54,14 +54,14 @@ void ofApp::setup(){
     //Video Presentation
 
 	
-	string absouluteVideoPath = path("intro.mp4");
-	cout << "\n chargement video " + absouluteVideoPath ;
+	string absoluteVideoPath = path("intro.mp4");
+	cout << "\n chargement video " + absoluteVideoPath ;
 	ofFile myFile;
-	if (myFile.doesFileExist(absouluteVideoPath, false)) {
+	if (myFile.doesFileExist(absoluteVideoPath, false)) {
 		cout << " Le fichier video existe\n ";
 	}
 
-	vidPresentation.load(absouluteVideoPath);
+	vidPresentation.load(absoluteVideoPath);
 	//vidPresentation.load("intro.mp4");
 	if (!vidPresentation.isLoaded()) {
 		cout << "\n Erreur chargement video : path : ";
@@ -144,12 +144,21 @@ void ofApp::setup(){
 	warper.setup(0, 0, IMGSIZEW, IMGSIZEH);
 	warper.activate();
     
+    /*******************************
+     TEXTURE for testing
+     ********************************/
+    imageTexture.allocate(IMGSIZEW, IMGSIZEH, GL_RGB);
     
-
+    
 }
 
 //--------------------------------------------------------------
 void ofApp::update(){
+    
+    PROFILE_START_FRAME;
+    PROFILE_BEGIN("Timelapse");
+    PROFILE_BEGIN("Update");
+    
 	
 	/*******************************
 	OSC receive message
@@ -230,65 +239,41 @@ void ofApp::update(){
     }
 
 
-
+ PROFILE_END();
 
 }
 
 //--------------------------------------------------------------
 void ofApp::draw(){
 	
+    
 	ofBackground(0);
 
 	/***********************************
 	 Images sequence is actually playing
 	**********************************/
 	if ( currentSequence > 0){
+        
 
 		ofBackground(0);
 		ofSetColor(255);
-			
-
-		/***********************************
-			Draw : 1 . Fbo blur 1st pass
-		**********************************/
-        fboBlurOnePass.begin();
-        shaderBlurX.begin();
-        shaderBlurX.setUniform1f("blurAmnt", blur);
         
-		/**************************************************
-			Draw : 2 . Draw sequence from mouse or index frame
-		***************************************************/
-        if(playingMouse){
-			float percent = ofMap(mouseX, 0, ofGetWidth(), 0.0, 1.0, true);
-            indexFrame = sequence.getFrameIndexAtPercent(percent);
-            if(indexFrame==0 || indexFrame != lastIndexFrame)  loadCurrentImage();
-            currentImg.draw(0, 0, IMGSIZEW, IMGSIZEH);
-	    lastIndexFrame = indexFrame;
+		loadCurrentImage();
+        
+        warper.begin();
+        PROFILE_BEGIN("Draw");
+	    //currentImg.draw(0, 0, IMGSIZEW, IMGSIZEH);
+        
+        imageTexture.draw(0, 0, IMGSIZEW, IMGSIZEH);
+        PROFILE_END();
+        warper.end();
+        if(indexFrame<(sequence.getTotalFrames()-2)){
+            indexFrame++;
+        }else{
+            indexFrame=0;
         }
-        else{
-            //sequence.getTextureForFrame(indexFrame).draw(0, 0, IMGSIZEW, IMGSIZEH);
-		if(indexFrame==0 || indexFrame != lastIndexFrame) loadCurrentImage();
-	    currentImg.draw(0, 0, IMGSIZEW, IMGSIZEH);
-		lastIndexFrame = indexFrame;
-        }
-        shaderBlurX.end();
-        fboBlurOnePass.end();
-            
-		/***********************************
-			Draw : 3 . Fbo blur 2nd pass
-		********************************/
-        fboBlurTwoPass.begin();
-        shaderBlurY.begin();
-        shaderBlurY.setUniform1f("blurAmnt", blur);
-        fboBlurOnePass.draw(0, 0);
-        shaderBlurY.end();
-        fboBlurTwoPass.end();
-            
-		/***********************************
-			Draw : 4 . Draw fbo inside quad warper
-		********************************/
-		warper.begin();
-		fboBlurTwoPass.draw(0, 0, ofGetWidth(), ofGetHeight());
+        
+        
 		/***********************************
 			Draw : 5 . Draw warper corner if needed
 		********************************/
@@ -303,19 +288,17 @@ void ofApp::draw(){
 			ofDrawBitmapStringHighlight(fps, ofVec2f(ofGetWidth() / 2, ofGetHeight() / 2), ofColor::black, ofColor::white);
 			ofDrawBitmapStringHighlight(ofToString(indexFrame), ofVec2f(ofGetWidth() / 2, (ofGetHeight() / 2) - 25), ofColor::black, ofColor::white);
 		}
-	
-		warper.end();
 		/***********************************
-			Draw : 7 . Draw FPS image title if needed
+			Draw : 7 . Draw image title if needed
 		********************************/
-        if(isLoading){
-            
-            ofSetColor(255);
-            ofEnableAlphaBlending();
-            listOfVignette[currentSequence-1].draw(0,0, ofGetWidth(), ofGetHeight());
-            ofDisableAlphaBlending();
-            
-        }
+//        if(isLoading){
+//
+//            ofSetColor(255);
+//            ofEnableAlphaBlending();
+//            listOfVignette[currentSequence-1].draw(0,0, ofGetWidth(), ofGetHeight());
+//            ofDisableAlphaBlending();
+//
+//        }
 
 	}
     else
@@ -331,6 +314,9 @@ void ofApp::draw(){
 		warper.end();
         
 	}
+    
+    PROFILE_END();
+    cout << ofxProfiler::getResults();
     
 
 
@@ -400,9 +386,9 @@ void ofApp::loadSequence(int num){
 		Choose Extension
 		***************************/
 		sequence.loadSequence(folderPath,
-                              //"jpg",
-				//			   "png",
-				"tif",
+                //              "JPG",
+							   "png",
+				//"tif",
                               listOfStartImage[num-1],
                               listOfStartImage[num-1] + listOfNbImage[num-1],
                               listOfNbDigit[num-1]);
@@ -451,7 +437,8 @@ void ofApp::loadSequence(int num){
 //--------------------------------------------------------------
 void ofApp::loadCurrentImage(){
 	string filename = sequence.filenames[indexFrame];
-            currentImg.load(filename);
+            //currentImg.load(filename);
+            ofLoadImage(imageTexture, filename);
 }
 
 //--------------------------------------------------------------
