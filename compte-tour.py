@@ -64,7 +64,7 @@ if __name__ == '__main__':
 			ser = serial.Serial('/dev/ttyACM0',115200)
 			#ser = serial.Serial('/dev/ttyACM1', 115200)
 		elif sys.platform.startswith('win'):
-			serialId=1
+			serialId=0
 			print("connection au Serial Windows : "+serialNames[serialId])
 			ser = serial.Serial(serialNames[serialId],115200)
 		else:

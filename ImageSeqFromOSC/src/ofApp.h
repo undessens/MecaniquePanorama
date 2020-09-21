@@ -18,7 +18,7 @@
 #include "ofxXmlSettings.h"
 #include "ofxGLWarper.h"
 #define IMGSIZEW (1920)
-#define IMGSIZEH (1080)
+#define IMGSIZEH (1200)
 #define EXPO (1.8f)
 #define SCREEN_SAVER (350)
 
@@ -47,6 +47,7 @@ class ofApp : public ofBaseApp
 	ofImage background;
     ofImage currentImg;
 	ofxOscReceiver receiver;
+	int nbMsgReceived;
 	bool playingMouse;
 	int indexFrame;
 	int lastIndexFrame;

@@ -46,6 +46,7 @@ void ofApp::setup(){
 
     // OSC-config
 	receiver.setup(12345);
+	nbMsgReceived = 0;
     
     // FrameRate ?
     ofSetFrameRate(30);
@@ -155,10 +156,12 @@ void ofApp::update(){
 	/*******************************
 	OSC receive message
 	********************************/
+	nbMsgReceived = 0;
 	while(receiver.hasWaitingMessages()){
 		// get the next message
 		ofxOscMessage m;
 		receiver.getNextMessage(&m);
+		nbMsgReceived++;
 
 		//Reset screen saver when osc message is received
 		screenSaverTime = ofGetElapsedTimef();
@@ -278,13 +281,14 @@ void ofApp::draw(){
 			float percent = ofMap(mouseX, 0, ofGetWidth(), 0.0, 1.0, true);
             indexFrame = sequence.getFrameIndexAtPercent(percent);
             if(indexFrame==0 || indexFrame != lastIndexFrame)  loadCurrentImage();
+			
             currentImg.draw(0, 0, IMGSIZEW, IMGSIZEH);
 	    lastIndexFrame = indexFrame;
         }
         else{
-            //sequence.getTextureForFrame(indexFrame).draw(0, 0, IMGSIZEW, IMGSIZEH);
 		if(indexFrame==0 || indexFrame != lastIndexFrame) loadCurrentImage();
 	    currentImg.draw(0, 0, IMGSIZEW, IMGSIZEH);
+		//sequence.getTextureForFrame(indexFrame).draw(0, 0, IMGSIZEW, IMGSIZEH);
 		lastIndexFrame = indexFrame;
         }
         shaderBlurX.end();
@@ -318,6 +322,7 @@ void ofApp::draw(){
 			string fps = "fps: " + ofToString(ofGetFrameRate());
 			ofDrawBitmapStringHighlight(fps, ofVec2f(ofGetWidth() / 2, ofGetHeight() / 2), ofColor::black, ofColor::white);
 			ofDrawBitmapStringHighlight(ofToString(indexFrame), ofVec2f(ofGetWidth() / 2, (ofGetHeight() / 2) - 25), ofColor::black, ofColor::white);
+			ofDrawBitmapStringHighlight(ofToString(nbMsgReceived), ofVec2f(ofGetWidth() / 2, (ofGetHeight() / 2) + 25), ofColor::black, ofColor::white);
 		}
 	
 		warper.end();
@@ -420,7 +425,7 @@ void ofApp::loadSequence(int num){
 		sequence.loadSequence(folderPath,
                               "jpg",
 							  // "png",
-				//"tif",
+							//"tif",
                               listOfStartImage[num-1],
                               listOfStartImage[num-1] + listOfNbImage[num-1],
                               listOfNbDigit[num-1]);

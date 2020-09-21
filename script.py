@@ -145,20 +145,20 @@ if __name__ == '__main__':
 				
 				if ( msg[0]== "-") :
 					if finalValue == -1000:
-						finalValue = -1
+						finalValue = 1
 					#oscMsg.setAddress("/transport/next")
 					#oscMsg.append(value*(value/4))
 					#oscMsg.append(value)
-					finalValue -= value
+					finalValue += value
 					isMessage = True
 					#print "next frames :"+str(value)
 				elif ( msg[0] == '+') :
 					if finalValue == -1000:
-						finalValue = 1
+						finalValue = -1
 					#oscMsg.setAddress("/transport/previous")
 					#oscMsg.append(value*(value/4))
 					#oscMsg.append(value) 
-					finalValue += value
+					finalValue -= value
 					isMessage = True
 					#print "previous frames : "+str(value)
 				#elif (msg[0] == 's'):
@@ -176,11 +176,11 @@ if __name__ == '__main__':
 				else:
 					oscMsg.setAddress("/transport/previous")
 					print "previous frames : "+str(finalValue)
-				oscMsg.append(finalValue)
+				oscMsg.append(abs(finalValue))
 				client.send(oscMsg)
 			except Exception, e:
 				print e	
 		
-		time.sleep(0.04)
+		time.sleep(0.055)
 
 
