@@ -4,7 +4,7 @@ import os
 import sys
 import glob
 import subprocess 
-from OSC import OSCClient, OSCMessage
+from OSC import OSCClient, OSCMessage, OSCServer
 
 #OS choose ofApp working directory
 #os.chdir('ImageSeqFromOSC/')
@@ -33,8 +33,17 @@ def kill_app():
 		subprocess.call([r'quit_app.bat'])
 	else:
 		subprocess.call(['./quit_app.sh'])
-	
 
+def shutdown_computer():
+	print("========= SHUTDOWN COMPUTER ======")
+	path = os.path.join(mpPath, "script")
+	os.chdir(path)
+	print("Path is "+path)
+	if sys.platform.startswith('win'):
+		subprocess.call(["shutdown", "/s"])
+	else:
+		subprocess.call(['sudo', 'shutdown', 'now'])
+	
 def serial_ports():
     """ Lists serial port names
 
@@ -109,19 +118,20 @@ if __name__ == '__main__':
 
 	#Start OF app
 	#stop_app()
-	#time.sleep(1)
-	#lauch_app(	)
+	time.sleep(1)
+	start_app()
 
 	#OSC
 	client = OSCClient()
 	client.connect( ("localhost", 12345))
 
+	client_broadcast = OSCClient()
+	client_broadcast.connect( ("192.168.255.255", 12399))
 
 	value = 0
 	param = []
 	msg = []
 
-	#start_app()
 	#time.sleep(10)
 	#kill_app()
 
@@ -167,6 +177,13 @@ if __name__ == '__main__':
 					#oscMsg.append(value)
 					#isMessage = True
 					#print "change Sequence:"+str(value)
+				elif (msg[0] == 'q'):
+					#Shutdown computer
+					#oscMsg.setAddress("/transport/changeSeq")
+					#oscMsg.append(value)
+					#isMessage = True
+					#print "change Sequence:"+str(value)
+					shutdown_computer()
 				
 		if(isMessage ):
 			try:

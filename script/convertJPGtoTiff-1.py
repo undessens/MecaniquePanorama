@@ -11,8 +11,8 @@ def getImgPaths(_path):
     return files
 
 # set folders
-folderToProcess = "E:/MecaniquePanorama/4"
-folderToPopulate = "E:/MecaniquePanorama/4/processed/"
+folderToProcess = "E:/MecaniquePanorama/1"
+folderToPopulate = "E:/MecaniquePanorama/1-tif/"
 fileNames = getImgPaths(folderToProcess)
 filesListFull = [folderToProcess + "/" + f for f in fileNames]
 

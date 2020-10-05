@@ -25,6 +25,7 @@
 
 
 
+
 class ofApp : public ofBaseApp
 {
 
@@ -59,6 +60,7 @@ class ofApp : public ofBaseApp
     int hardPos;
     float smoothAlpha;
 	bool isPrintFps;
+	string extension;
 
 	//Directory management
     ofxXmlSettings XML;
@@ -79,6 +81,7 @@ class ofApp : public ofBaseApp
     
     //Quad Warping
     ofxGLWarper warper;
+	ofXml xml_warper;
     
     //Blur fbo
     ofShader shaderBlurX;
@@ -90,7 +93,7 @@ class ofApp : public ofBaseApp
 	//Screen saver
 	long double screenSaverTime;
     
-    float blur;
+	float blur;
     
 };
 

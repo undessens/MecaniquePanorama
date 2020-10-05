@@ -18,6 +18,8 @@
 
 //--------------------------------------------------------------
 void ofApp::setup(){
+
+	extension = "png";
 	
 	cout << "PRINT YOUR CURRENT OS : \n";
 	//First of all : change the data path directory to another disk
@@ -142,7 +144,8 @@ void ofApp::setup(){
 	Quad warper
 	********************************/
 	warper.setup(0, 0, IMGSIZEW, IMGSIZEH);
-	warper.activate();
+	warper.load(path("corner_settings.xml"));
+
     
     /*******************************
      TEXTURE for testing
@@ -339,6 +342,15 @@ void ofApp::keyPressed(int key){
         case 'w':
 			if (warper.isActive()) {
 				warper.deactivate();
+
+				warper.save();
+				warper.saveToXml(xml_warper);
+				ofLogNotice(xml_warper.toString());
+				//xml.setName("war_settings");
+				if (!xml_warper.save(path("corner_settings.xml"))) {
+					ofLogError() << "Couldn't save points.xml";
+				}
+
 			}
 			else {
 				warper.activate();
@@ -380,15 +392,13 @@ void ofApp::loadSequence(int num){
 		Choose the folder of images
 		***************************/
        		// string folderPath = path(ofToString(num)) +"/processed/";
-		string folderPath = path(ofToString(num)) + "/";
+		string folderPath = path(ofToString(num)) + "-"+ extension+"/";
 
 		/**************************
 		Choose Extension
 		***************************/
 		sequence.loadSequence(folderPath,
-                //              "JPG",
-							   "png",
-				//"tif",
+								extension,
                               listOfStartImage[num-1],
                               listOfStartImage[num-1] + listOfNbImage[num-1],
                               listOfNbDigit[num-1]);

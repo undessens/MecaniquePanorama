@@ -14,10 +14,10 @@ def getImgPaths(_path):
 
 for i in range(1):
 
-    #folderToProcess = "E:/MecaniquePanorama/"+str(i+1)
-    folderToProcess = "/Volumes/FAT32/MecaniquePanorama/"+str(i+1)
-    #folderToPopulate = "E:/MecaniquePanorama/"+str(i+1)+"/processed/"
-    folderToPopulate = "/Volumes/FAT32/MecaniquePanorama/"+str(i+1)+"-png/"
+    folderToProcess = "E:/MecaniquePanorama/"+str(i+1)
+    #folderToProcess = "/Volumes/FAT32/MecaniquePanorama/"+str(i+1)
+    folderToPopulate = "E:/MecaniquePanorama/"+str(i+1)+"-png/"
+    #folderToPopulate = "/Volumes/FAT32/MecaniquePanorama/"+str(i+1)+"-png/"
     fileNames = getImgPaths(folderToProcess)
     filesListFull = [folderToProcess + "/" + f for f in fileNames]
 
