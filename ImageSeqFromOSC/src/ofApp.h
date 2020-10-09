@@ -22,6 +22,7 @@
 #define IMGSIZEH (1080)
 #define EXPO (1.8f)
 #define SCREEN_SAVER (350)
+//#define PROFILER (1)
 
 
 
@@ -50,6 +51,7 @@ class ofApp : public ofBaseApp
 	ofImage background;
     ofImage currentImg;
 	ofxOscReceiver receiver;
+	ofxOscSender sender;
 	bool playingMouse;
 	int indexFrame;
 	int lastIndexFrame;

@@ -48,6 +48,7 @@ void ofApp::setup(){
 
     // OSC-config
 	receiver.setup(12345);
+	sender.setup("192.168.1.255", 9999);
     
     // FrameRate ?
     ofSetFrameRate(30);
@@ -270,11 +271,20 @@ void ofApp::draw(){
         imageTexture.draw(0, 0, IMGSIZEW, IMGSIZEH);
         PROFILE_END();
         warper.end();
-        if(indexFrame<(sequence.getTotalFrames()-2)){
-            indexFrame++;
-        }else{
-            indexFrame=0;
-        }
+
+		/***********************************
+			Auto Increase : 5 .
+		********************************/
+#ifdef PROFILER
+		if (indexFrame < (sequence.getTotalFrames() - 2)) {
+			indexFrame++;
+	}
+		else {
+			indexFrame = 0;
+		}
+#endif // PROFILER
+
+        
         
         
 		/***********************************
@@ -319,8 +329,9 @@ void ofApp::draw(){
 	}
     
     PROFILE_END();
+#ifdef PROFILER
     cout << ofxProfiler::getResults();
-    
+#endif
 
 
 }
@@ -374,6 +385,16 @@ void ofApp::keyPressed(int key){
 
 //--------------------------------------------------------------
 void ofApp::loadSequence(int num){
+
+	/**************************
+		SEND OSC MESSAGE TO ALL
+	***************************/
+	ofxOscMessage msg;
+	msg.setAddress("/sequence");
+	msg.addInt32Arg(num);
+	sender.sendMessage(msg);
+	ofLogNotice("Sequence changed "+ofToString(num)+" : send osc message");
+
 
 	/**************************
 		Load an sequence of images
@@ -462,7 +483,7 @@ void ofApp::listNumSequence(){
 	dir.listDir();
 	for (int i = 1; i < 20; i++) {
 
-		if (dir.doesDirectoryExist(path(ofToString(i)))){
+		if (dir.doesDirectoryExist(path(ofToString(i) + "-" + extension ))){
 			totalNumSequence++;
 		}
 
