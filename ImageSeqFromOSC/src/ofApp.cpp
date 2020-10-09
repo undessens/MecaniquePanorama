@@ -45,6 +45,7 @@ void ofApp::setup(){
 
 
     // OSC-config
+	sender.setup("192.168.10.255", 9999);
 	receiver.setup(12345);
 	nbMsgReceived = 0;
     
@@ -400,6 +401,14 @@ void ofApp::keyPressed(int key){
 //--------------------------------------------------------------
 void ofApp::loadSequence(int num){
 
+	/**************************
+		Inform all the sequence changed
+	***************************/
+	ofxOscMessage msg;
+	msg.setAddress("/sequence");
+	msg.addInt32Arg(num);
+	sender.sendMessage(msg);
+	
 	/**************************
 		Load an sequence of images
 	***************************/

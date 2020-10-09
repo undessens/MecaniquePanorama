@@ -47,6 +47,7 @@ class ofApp : public ofBaseApp
 	ofImage background;
     ofImage currentImg;
 	ofxOscReceiver receiver;
+	ofxOscSender sender;
 	int nbMsgReceived;
 	bool playingMouse;
 	int indexFrame;
