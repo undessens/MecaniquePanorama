@@ -18,7 +18,7 @@
 #include "ofxXmlSettings.h"
 #include "ofxGLWarper.h"
 #define IMGSIZEW (1920)
-#define IMGSIZEH (1200)
+#define IMGSIZEH (1080)
 #define EXPO (1.8f)
 #define SCREEN_SAVER (350)
 
@@ -80,6 +80,7 @@ class ofApp : public ofBaseApp
     
     //Quad Warping
     ofxGLWarper warper;
+	ofXml xml_warper;
     
     //Blur fbo
     ofShader shaderBlurX;

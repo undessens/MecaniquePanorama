@@ -45,7 +45,6 @@ void ofApp::setup(){
 
 
     // OSC-config
-	sender.setup("192.168.10.255", 9999);
 	receiver.setup(12345);
 	nbMsgReceived = 0;
     
@@ -145,8 +144,14 @@ void ofApp::setup(){
 	Quad warper
 	********************************/
 	warper.setup(0, 0, IMGSIZEW, IMGSIZEH);
-	warper.activate();
-    
+	warper.load(path("corner_settings.xml"));
+	//warper.activate();
+
+	/*******************************
+	Hide Mouse
+	********************************/
+	ofHideCursor();
+
     
 
 }
@@ -205,7 +210,7 @@ void ofApp::update(){
 	/******************************************************************
 	Update Screen saver : #define SCREEN_SAVER (350)
 	********************************************************************/
-	if ((ofGetElapsedTimef() - screenSaverTime) > SCREEN_SAVER) {
+	if ((ofGetElapsedTimef() - screenSaverTime) > SCREEN_SAVER && currentSequence>0) {
 		loadSequence(0);
 	}
 
@@ -310,6 +315,18 @@ void ofApp::draw(){
 		********************************/
 		warper.begin();
 		fboBlurTwoPass.draw(0, 0, ofGetWidth(), ofGetHeight());
+		
+		/***********************************
+			Draw : 7 . Draw FPS image title if needed
+		********************************/
+		if (isLoading) {
+
+			ofSetColor(255);
+			ofEnableAlphaBlending();
+			listOfVignette[currentSequence - 1].draw(0, 0, ofGetWidth(), ofGetHeight());
+			ofDisableAlphaBlending();
+
+		}
 		/***********************************
 			Draw : 5 . Draw warper corner if needed
 		********************************/
@@ -327,17 +344,7 @@ void ofApp::draw(){
 		}
 	
 		warper.end();
-		/***********************************
-			Draw : 7 . Draw FPS image title if needed
-		********************************/
-        if(isLoading){
-            
-            ofSetColor(255);
-            ofEnableAlphaBlending();
-            listOfVignette[currentSequence-1].draw(0,0, ofGetWidth(), ofGetHeight());
-            ofDisableAlphaBlending();
-            
-        }
+		
 
 	}
     else
@@ -377,6 +384,12 @@ void ofApp::keyPressed(int key){
         case 'w':
 			if (warper.isActive()) {
 				warper.deactivate();
+				warper.saveToXml(xml_warper);
+				ofLogNotice(xml_warper.toString());
+				//xml.setName("war_settings");
+				if (!xml_warper.save(path("corner_settings.xml"))) {
+					ofLogError() << "Couldn't save points.xml";
+				}
 			}
 			else {
 				warper.activate();
@@ -404,10 +417,17 @@ void ofApp::loadSequence(int num){
 	/**************************
 		Inform all the sequence changed
 	***************************/
-	ofxOscMessage msg;
-	msg.setAddress("/sequence");
-	msg.addInt32Arg(num);
-	sender.sendMessage(msg);
+
+
+	if (sender.setup("192.168.1.255", 9999)) {
+		ofxOscMessage msg;
+		msg.setAddress("/sequence");
+		msg.addInt32Arg(num);
+		sender.sendMessage(msg);
+		ofLogNotice("Sequence changed " + ofToString(num) + " : send osc message");
+	}
+
+
 	
 	/**************************
 		Load an sequence of images
@@ -469,6 +489,7 @@ void ofApp::loadSequence(int num){
 
 		cout << "\n Image de demarrage" ;
 			currentSequence = 0;
+			vidPresentation.setLoopState(OF_LOOP_NORMAL);
 			vidPresentation.firstFrame();
 			vidPresentation.play();
 		} else {
@@ -565,6 +586,31 @@ void ofApp::mouseDragged(int x, int y, int button){
 
 //--------------------------------------------------------------
 void ofApp::mousePressed(int x, int y, int button){
+
+	// ON right click
+	if (button == 2) {
+		// Both right and left click : quit app
+		if (ofGetMousePressed(0)) {
+			ofExit();
+		}
+		else {
+			if (warper.isActive()) {
+				ofHideCursor();
+				warper.deactivate();
+				warper.saveToXml(xml_warper);
+				ofLogNotice(xml_warper.toString());
+				//xml.setName("war_settings");
+				if (!xml_warper.save(path("corner_settings.xml"))) {
+					ofLogError() << "Couldn't save points.xml";
+				}
+			}
+			else {
+				ofShowCursor();
+				warper.activate();
+			}
+
+		}
+	}
 
 }
 

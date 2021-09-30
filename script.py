@@ -33,6 +33,16 @@ def kill_app():
 		subprocess.call([r'quit_app.bat'])
 	else:
 		subprocess.call(['./quit_app.sh'])
+
+def shutdown_computer():
+	print("========= SHUTDOWN COMPUTER ======")
+	path = os.path.join(mpPath, "script")
+	os.chdir(path)
+	print("Path is "+path)
+	if sys.platform.startswith('win'):
+		subprocess.call(["shutdown", "/s"])
+	else:
+		subprocess.call(['sudo', 'shutdown', 'now'])
 	
 
 def serial_ports():
@@ -107,10 +117,11 @@ if __name__ == '__main__':
 		print "Impossible to connect to Serial"
 		ser = None	
 
+
 	#Start OF app
 	#stop_app()
-	#time.sleep(1)
-	#lauch_app(	)
+	time.sleep(1)
+	start_app()
 
 	#OSC
 	client = OSCClient()
@@ -120,10 +131,6 @@ if __name__ == '__main__':
 	value = 0
 	param = []
 	msg = []
-
-	#start_app()
-	#time.sleep(10)
-	#kill_app()
 
 
 
@@ -167,6 +174,13 @@ if __name__ == '__main__':
 					#oscMsg.append(value)
 					#isMessage = True
 					#print "change Sequence:"+str(value)
+				elif (msg[0] == 'q'):
+					#Shutdown computer
+					#oscMsg.setAddress("/transport/changeSeq")
+					#oscMsg.append(value)
+					#isMessage = True
+					#print "change Sequence:"+str(value)
+					shutdown_computer()
 				
 		if(isMessage ):
 			try:
