@@ -211,6 +211,8 @@ void ofApp::update(){
 	Update Screen saver : #define SCREEN_SAVER (350)
 	********************************************************************/
 	if ((ofGetElapsedTimef() - screenSaverTime) > SCREEN_SAVER && currentSequence>0) {
+		ofLogNotice("Screen saver is starting");
+
 		loadSequence(0);
 	}
 
@@ -245,7 +247,7 @@ void ofApp::update(){
 	*************************************************************/
 
 	if (currentSequence > 0 && isTestMode) {
-		if (indexFrame < sequence.getTotalFrames()) {
+		if (indexFrame < (sequence.getTotalFrames()-1 )) {
 			indexFrame++;
 		}
 		else {
@@ -292,7 +294,9 @@ void ofApp::draw(){
 	    lastIndexFrame = indexFrame;
         }
         else{
-		if(indexFrame==0 || indexFrame != lastIndexFrame) loadCurrentImage();
+			if (indexFrame == 0 || indexFrame != lastIndexFrame) {
+				loadCurrentImage();
+			}
 	    currentImg.draw(0, 0, IMGSIZEW, IMGSIZEH);
 		//sequence.getTextureForFrame(indexFrame).draw(0, 0, IMGSIZEW, IMGSIZEH);
 		lastIndexFrame = indexFrame;
@@ -441,6 +445,11 @@ void ofApp::loadSequence(int num){
         if(num > totalNumSequence){
             num = totalNumSequence;
         }
+
+		/*************************
+		STOP VIDEO PRESENTATION 
+		****************************/
+		vidPresentation.stop();
 
 		/**************************
 		Choose the folder of images
