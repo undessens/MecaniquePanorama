@@ -78,9 +78,12 @@
 // Il a 2 machines correspondants à 2 contenus de mp3
 // Une machine principale et machine secondaire
 // Commenter cette ligne pour la machine secondaire.
-//#define MAIN_MACHINE
+#define MAIN_MACHINE
 
-#define VOLUME 5
+// !!!! Volume is inversed
+// VOLUME 10 means maximum volume
+// VOLUME 240 means silence
+#define VOLUME 35
 
 // touch constants
 const uint32_t BAUD_RATE = 115200;
