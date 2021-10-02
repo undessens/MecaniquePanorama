@@ -336,7 +336,7 @@ void ofApp::draw(){
          ********************************/
             ofSetColor(255);
             ofEnableAlphaBlending();
-            listOfIcon[currentSequence - 1].draw(ofGetWidth()-200, 0, 200, 200);
+            listOfIcon[currentSequence - 1].draw(ofGetWidth()-200, 50, 150, 150);
             ofDisableAlphaBlending();
         
 		/***********************************
@@ -396,6 +396,7 @@ void ofApp::keyPressed(int key){
         case 'w':
 			if (warper.isActive()) {
 				warper.deactivate();
+				ofHideCursor();
 				warper.saveToXml(xml_warper);
 				ofLogNotice(xml_warper.toString());
 				//xml.setName("war_settings");
@@ -405,6 +406,7 @@ void ofApp::keyPressed(int key){
 			}
 			else {
 				warper.activate();
+				ofShowCursor();
 			}
         break;
 		case '1':loadSequence(1);
@@ -576,7 +578,7 @@ void ofApp::listNumSequence(){
 		listOfVignette.push_back(img);
         
         ofImage icon ;
-        if( !icon.load("icon/"+ofToString(i)+".png")){
+        if( !icon.load(path("icon/"+ofToString(i)+".png"))) {
             icon.allocate(200, 200 , OF_IMAGE_COLOR);
         }
         listOfIcon.push_back(icon);
