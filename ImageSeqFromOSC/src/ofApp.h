@@ -72,6 +72,7 @@ class ofApp : public ofBaseApp
 	float loadingDuration;
 	bool isLoading;
 	vector<ofImage> listOfVignette;
+    vector<ofImage> listOfIcon;
 	vector<int> listOfNbImage;
     vector<int> listOfStartImage;
     vector<int> listOfNbDigit;

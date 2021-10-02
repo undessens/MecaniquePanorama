@@ -321,7 +321,7 @@ void ofApp::draw(){
 		fboBlurTwoPass.draw(0, 0, ofGetWidth(), ofGetHeight());
 		
 		/***********************************
-			Draw : 7 . Draw FPS image title if needed
+			Draw : 5 . Draw Vignette if loading
 		********************************/
 		if (isLoading) {
 
@@ -331,14 +331,22 @@ void ofApp::draw(){
 			ofDisableAlphaBlending();
 
 		}
+        /***********************************
+         Draw : 6 . Draw Icon number everytime
+         ********************************/
+            ofSetColor(255);
+            ofEnableAlphaBlending();
+            listOfIcon[currentSequence - 1].draw(ofGetWidth()-200, 0, 200, 200);
+            ofDisableAlphaBlending();
+        
 		/***********************************
-			Draw : 5 . Draw warper corner if needed
+			Draw : 7 . Draw warper corner if needed
 		********************************/
 		if (warper.isActive()) {
 			warper.draw();
 		}
 		/***********************************
-			Draw : 6 . Draw FPS if needed
+			Draw : 8 . Draw FPS if needed
 		********************************/
 		if (isPrintFps) {
 			string fps = "fps: " + ofToString(ofGetFrameRate());
@@ -423,6 +431,7 @@ void ofApp::loadSequence(int num){
 	***************************/
 
 
+    /*
 	if (sender.setup("192.168.1.255", 9999)) {
 		ofxOscMessage msg;
 		msg.setAddress("/sequence");
@@ -430,6 +439,7 @@ void ofApp::loadSequence(int num){
 		sender.sendMessage(msg);
 		ofLogNotice("Sequence changed " + ofToString(num) + " : send osc message");
 	}
+     */
 
 
 	
@@ -564,6 +574,15 @@ void ofApp::listNumSequence(){
 			img.allocate(1280, 720 , OF_IMAGE_COLOR);
 		}
 		listOfVignette.push_back(img);
+        
+        ofImage icon ;
+        if( !icon.load("icon/"+ofToString(i)+".png")){
+            icon.allocate(200, 200 , OF_IMAGE_COLOR);
+        }
+        listOfIcon.push_back(icon);
+        
+        
+        
 	}
 
 	cout << "\n end of scanning files \n ";
