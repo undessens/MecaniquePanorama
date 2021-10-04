@@ -175,7 +175,7 @@ void ofApp::update(){
 		// check for mouse moved message
 		if(m.getAddress() == "/transport/next"){
 
-			int step = m.getArgAsInt(0) +1;
+			int step = m.getArgAsInt(0) ;
 			if (indexFrame <  (sequence.getTotalFrames()-step) ){
 				indexFrame+=step;
 			}
@@ -187,7 +187,7 @@ void ofApp::update(){
 		}
 		if(m.getAddress() == "/transport/previous"){
 
-			int step = m.getArgAsInt(0) +1;
+			int step = m.getArgAsInt(0);
 			if( indexFrame > step){
 				indexFrame-=step;
 			}
