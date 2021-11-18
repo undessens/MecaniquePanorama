@@ -89,8 +89,8 @@ void loop(){
    float alpha = 0.3;
    speed = newSpeed*alpha + speed*(1.0 - alpha);
    //transform speed to stay around 0 and 10
-   speed = map(int(speed),0,40, 0, 10);
-   if(speed > 9) speed = 9;
+   speed = map(int(speed),0,40, 0, 15);
+   //if(speed > 20) speed = 20;
    time = millis();
    Serial.print( "+"); 
    Serial.println(char('0' + speed)); 
@@ -106,8 +106,8 @@ void loop(){
    float alpha = 0.3;
    speed = newSpeed*alpha + speed*(1.0 - alpha);
    //transform speed to stay around 0 and 10
-   speed = map(int(speed),0,40, 0, 10);
-   if(speed > 9) speed = 9;
+   speed = map(int(speed),0,40, 0, 15);
+   //if(speed > 20) speed = 20;
    time = millis(); 
    count --;
    Serial.print("-");
