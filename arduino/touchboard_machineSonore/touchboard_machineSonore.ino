@@ -80,7 +80,10 @@
 // Commenter cette ligne pour la machine secondaire.
 //#define MAIN_MACHINE
 
-#define VOLUME 5
+// !!!! Volume is inversed
+// VOLUME 10 means maximum volume
+// VOLUME 240 means silence
+#define VOLUME 32
 
 // touch constants
 const uint32_t BAUD_RATE = 115200;
@@ -102,7 +105,7 @@ uint8_t lastPlayed = 0;
 SFEMP3Shield MP3player;
 
 // MP3 behaviour constants
-const bool REPLAY_MODE = true;  // by default, touching an electrode repeatedly will
+const bool REPLAY_MODE = false;  // by default, touching an electrode repeatedly will
                                 // play the track again from the start each time
                                 //
                                 // if you set this to false, repeatedly touching an
@@ -126,7 +129,8 @@ const int nbFilePerInhabitant[5] = { 2 , 1, 2, 2, 3 };
 int indexPerInhabitant[5] = { 0, 0, 0, 0, 0};
 
 // Threshold : ability to trigger a track
-int treshold_touch = 80;
+int treshold_touch = 50;
+int treshold_touch_release = 20;
 
 
 void playFilePerInhabitant( int indexInhabitant ){
@@ -197,7 +201,7 @@ void setup() {
     MPR121_Datastream.begin(&Serial);
   } else {
     MPR121.setTouchThreshold(treshold_touch);
-    MPR121.setReleaseThreshold(treshold_touch/2);
+    MPR121.setReleaseThreshold(treshold_touch_release);
   }
 
   MPR121.setFFI(FFI_10);
@@ -252,7 +256,7 @@ void loop() {
                 // REPLAY_MODE), stop and play the newly requested one
                 MP3player.stopTrack();
                 //MP3player.playTrack(i-0);
-                playFilePerInhabitant(i);
+                //playFilePerInhabitant(i);
 
                 if (!MPR121_DATASTREAM_ENABLE) {
                   Serial.print("playing track ");
