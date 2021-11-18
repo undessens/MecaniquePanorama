@@ -334,10 +334,7 @@ void ofApp::draw(){
         /***********************************
          Draw : 6 . Draw Icon number everytime
          ********************************/
-            ofSetColor(255);
-            ofEnableAlphaBlending();
-            listOfIcon[currentSequence - 1].draw(ofGetWidth()-200, 50, 150, 150);
-            ofDisableAlphaBlending();
+            //ofSetColor(255);22222ofDisableAlphaBlending();
         
 		/***********************************
 			Draw : 7 . Draw warper corner if needed
