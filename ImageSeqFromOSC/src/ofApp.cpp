@@ -49,7 +49,8 @@ void ofApp::setup(){
 	nbMsgReceived = 0;
     
     // FrameRate ?
-    ofSetFrameRate(30);
+    //ofSetFrameRate(30);
+	ofSetVerticalSync(true);
 	isPrintFps = false;
 	isTestMode = false;
     
@@ -67,7 +68,7 @@ void ofApp::setup(){
 	//vidPresentation.load("intro.mp4");
 	if (!vidPresentation.isLoaded()) {
 		cout << "\n Erreur chargement video : path : ";
-		cout << vidPresentation.getMoviePath() + "\n";
+		cout << absouluteVideoPath + "\n";
 	}
     vidPresentation.setLoopState(OF_LOOP_NORMAL);
     vidPresentation.stop();
@@ -486,9 +487,14 @@ void ofApp::loadSequence(int num){
         loadingTime = 0;
         loadingStartTime = ofGetElapsedTimef();
         isLoading = true;
+
+		//Save current position of frame
+		if (currentSequence > 0) {
+			listOfCurrentFrame[currentSequence - 1] = indexFrame;
+		}
         currentSequence = num;
-	indexFrame = 0;
-	lastIndexFrame = 0;
+		indexFrame = listOfCurrentFrame[num-1];
+		lastIndexFrame = 0;
         blur = 2.0f;
         cout << "\n  load this sequence " << ofToString(num);
 		if (sequence.isLoading()) {
@@ -568,6 +574,7 @@ void ofApp::listNumSequence(){
 		listOfNbImage.push_back(nbImage);
         listOfStartImage.push_back(startImage);
         listOfNbDigit.push_back(nbDigit);
+		listOfCurrentFrame.push_back(0);
 
 		if( !img.load(dirOfSeq.getAbsolutePath()+"/intro.png")){
 			img.allocate(1280, 720 , OF_IMAGE_COLOR);

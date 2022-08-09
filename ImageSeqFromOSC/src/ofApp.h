@@ -76,6 +76,9 @@ class ofApp : public ofBaseApp
 	vector<int> listOfNbImage;
     vector<int> listOfStartImage;
     vector<int> listOfNbDigit;
+	vector<int> listOfCurrentFrame;
+
+
 	ofImage imagePresentation;
     ofVideoPlayer vidPresentation;
     
