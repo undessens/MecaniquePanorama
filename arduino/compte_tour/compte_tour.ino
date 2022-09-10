@@ -13,12 +13,11 @@ optical IR sensor ( pin A0, A1 ) and IR emitter A2
 
 +
 
-4 buttons, used as selector
-pin 10, 11, 12, 13
-+
-
 relay , turning on and off according to wheel frequency
-pin 8
+pin A5
+
+bouton OFF : send a turn off message to computer
+pin 8 ( 2nd wire to GND )
 
 
 */ 
@@ -29,16 +28,15 @@ int pinIR = A2;
 int pinSens1 = A0;
 int pinSens2 = A1;
 
-//Buttons from sequence choices
-int pinBut1 = 9;
-int pinBut2 = 10;
-int pinBut3 = 11;
-int pinBut4 = 12;
+//Buttons turn off computer
+int pinButOff = 8;
 
 //Algorithm
 int currentChoice = 0;
 boolean sens1 = false;
 boolean sens2 = false;
+boolean state1 = false;
+boolean state2 = false;
 boolean direction = false; //clockwise, anti-clockwise
 long long int count= 0;
 unsigned long time;
@@ -56,10 +54,7 @@ void setup(){
   pinMode (  pinIR, OUTPUT);
   pinMode ( pinSens1, INPUT);
   pinMode ( pinSens2, INPUT);
-  pinMode ( pinBut1, INPUT_PULLUP );
-  pinMode ( pinBut2, INPUT_PULLUP );
-  pinMode ( pinBut3, INPUT_PULLUP );
-  pinMode ( pinBut4, INPUT_PULLUP );
+  pinMode ( pinButOff, INPUT_PULLUP );
   pinMode ( pinRelay, OUTPUT );
   
   digitalWrite(pinIR, HIGH);
@@ -72,19 +67,32 @@ void setup(){
 
 void loop(){
   
-  boolean newSens1 = analogRead(pinSens1) < 680;
-  boolean newSens2 = analogRead(pinSens2) < 680;
+  int sens1 = analogRead(pinSens1);
+  int sens2 = analogRead(pinSens2);
+  boolean newState1 = state1;
+  boolean newState2 = state2;
+
+  
+  if(state1 && (sens1 < 600))
+  newState1 = false;
+  if(!state1 && (sens1 > 750))
+  newState1 = true;
+  if(state2 && (sens2 < 600))
+  newState2 = false;
+  if(!state2 && (sens2 > 750))
+  newState2 = true;
+
   
   
-  if ( newSens1 &&  sens2 && !sens1 ){
+  if ( newState1 &&  state2 && !state1 ){
      
 
    float newSpeed = 1000/( millis() - time );
    float alpha = 0.3;
    speed = newSpeed*alpha + speed*(1.0 - alpha);
    //transform speed to stay around 0 and 10
-   speed = map(int(speed),0,40, 0, 10);
-   if(speed > 9) speed = 9;
+   speed = map(int(speed),0,40, 0, 15);
+   //if(speed > 20) speed = 20;
    time = millis();
    Serial.print( "+"); 
    Serial.println(char('0' + speed)); 
@@ -94,14 +102,14 @@ void loop(){
    
    
   }
-  if ( newSens2 &&  sens1 && !sens2 ){
+  if ( newState2 &&  state1 && !state2 ){
     
    float newSpeed = 1000/( millis() - time );
    float alpha = 0.3;
    speed = newSpeed*alpha + speed*(1.0 - alpha);
    //transform speed to stay around 0 and 10
-   speed = map(int(speed),0,40, 0, 10);
-   if(speed > 9) speed = 9;
+   speed = map(int(speed),0,40, 0, 15);
+   //if(speed > 20) speed = 20;
    time = millis(); 
    count --;
    Serial.print("-");
@@ -110,8 +118,8 @@ void loop(){
    updateRelay();
   }
 
-  sens1 = newSens1; 
-  sens2 = newSens2;
+  state1 = newState1; 
+  state2 = newState2;
   
   updateChoiceButton();
 
@@ -121,84 +129,19 @@ void loop(){
 
 boolean updateChoiceButton(){
   
-  boolean newBut1 = digitalRead(pinBut1);
-  boolean newBut2 = digitalRead(pinBut2);
-  boolean newBut3 = digitalRead(pinBut3);
-  boolean newBut4 = digitalRead(pinBut4);
-  
-  // if no button is pressed
-  if(currentChoice == 0){
-     //check if any button is pressed
-    
-    
-    if(newBut1){
-      changeChoice(1);
-    }
-    else if(newBut2){
-      changeChoice(2);
-    }
-    else if(newBut3){
-      changeChoice(3);
-    }
-    else if(newBut4) {
-      changeChoice(4);
-    }
-  
-  }
-  else{
-    
-   switch(currentChoice){
+  boolean newButOff = digitalRead(pinButOff);
 
-    /*if button is not pressed anymore, 
-    1) Wait 120 ms as a security, avoid "fantom" release
-    2)Wait 400ms in changeChoice
-       then recheak the digital pin, using updateChoiceButton's boolean return
-     */
-    delay(120);
-    
-    case 1: if(!newBut1 && !digitalRead(pinBut1)) changeChoice(0);
-    break;
-    case 2: if(!newBut2 && !digitalRead(pinBut2)) changeChoice(0);
-    break;
-    case 3: if(!newBut3 && !digitalRead(pinBut3)) changeChoice(0);
-    break;
-    case 4: if(!newBut4 && !digitalRead(pinBut4)) changeChoice(0);
-    break;
-    
-   } 
-    
+  if( newButOff == LOW ){
+
+    delay(3000);
+    if(digitalRead(pinButOff) == LOW ){
+      Serial.println( "q1"); 
+    }
   }
   
-  return ( newBut1 || newBut2 || newBut3 || newBut4 );
+
 }
 
-
-void changeChoice( int i ){
-  
-  if( i >= 0 && i < 10 ){
-    
-    if( i == 0 ){
-       //Be sure that user is not going to press another button
-      delay(400 );
-      currentChoice = 0;
-      if(!updateChoiceButton()){
-        //nothing is pressed after 500 ms of released 
-        Serial.print( "s"); 
-        Serial.println(char('0'));
-      }
-   
-    }
-    else
-    {
-      Serial.print( "s"); 
-      Serial.println(char('0' + i)); 
-      currentChoice = i;
-      delay(200);
-    }
-  
-  }
-   
-}
 
 void updateRelay(){
 

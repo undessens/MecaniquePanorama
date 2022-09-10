@@ -61,6 +61,10 @@ void loop(){
   Serial.print(" ");
   Serial.println(state2*1048 + 50 );
 */
+Serial.print(0);
+Serial.print(" ");
+Serial.print(1300);
+Serial.print(" ");
  Serial.print(sens1);
  Serial.print(" ");
  Serial.println(sens2);
