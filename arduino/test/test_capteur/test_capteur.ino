@@ -19,6 +19,8 @@ boolean state2 = false;
 
 int pinRelay = A5;
 
+float smoothness = 100.0;
+
 void setup(){
   
   pinMode (  pinIR, OUTPUT);
@@ -34,11 +36,20 @@ void setup(){
  
 }
 
+float lerp(float a, float b, float t) {
+  return a + t*(b-a);
+}
+float previousTime = 0.0;
+int smoothed1 = 0;
+int smoothed2 = 0;
 void loop(){
   
   int sens1 = analogRead(pinSens1);
   int sens2 = analogRead(pinSens2);
-
+  float elapsedTime = millis() - previousTime;
+  previousTime = millis();
+  smoothed1 = lerp(smoothed1, sens1, (elapsedTime /1000) * smoothness);
+  smoothed2 = lerp(smoothed2, sens2, (elapsedTime /1000)* smoothness);
   
   if(state1 && (sens1 < 550))
   state1 = false;
@@ -61,13 +72,27 @@ void loop(){
   Serial.print(" ");
   Serial.println(state2*1048 + 50 );
 */
+Serial.print(1200);
+Serial.print(" ");
 Serial.print(0);
 Serial.print(" ");
-Serial.print(1300);
-Serial.print(" ");
- Serial.print(sens1);
+ /*Serial.print(sens1);
  Serial.print(" ");
- Serial.println(sens2);
+ Serial.print(sens2);
+ Serial.print(" ");*/
+ Serial.print(smoothed1);
+ Serial.print(" ");
+ if(state1)
+  Serial.print("1100");
+  else
+  Serial.print("0");
+ Serial.print(" ");
+ if(state2)
+  Serial.print("1100");
+  else
+  Serial.print("0");
+  Serial.print(" ");
+ Serial.println(smoothed2);
 /*
   if(bsens1 && !state1){
      
