@@ -30,8 +30,8 @@ void ofApp::setup(){
 	cout << "WINDOWS CONFIGURATION \n";
 	filesystem::path mydatapath = "E:/MecaniquePanorama/";
 	//filesystem::path mydatapath = "C:/Users/Aurelien/Documents/OPENFRAMEWORKS/of_v0.10.0_vs2017_release/apps/MecaniquePanorama/ImageSeqFromOSC/bin/data/";
-	dir = ofDirectory(mydatapath);
-	ofSetDataPathRoot(mydatapath);
+	dir = ofDirectory("");
+	//ofSetDataPathRoot(mydatapath);
 #else
 	cout << "LINUX CONFIGURATION \n";	
 	const string mydatapath = "/media/nano/FAT32/MecaniquePanorama/";
@@ -40,7 +40,7 @@ void ofApp::setup(){
 #endif
     
     //Out the current directory
-    cout << "\n Directory of MP data ( video + image ) : " + dir.getOriginalDirectory();
+	cout << "\n Directory of MP data ( video + image ) : ";
     cout << "\n nb file : " + ofToString(dir.listDir()) + "\n";
 
 
@@ -60,12 +60,12 @@ void ofApp::setup(){
 	string absouluteVideoPath = path("intro.mp4");
 	cout << "\n chargement video " + absouluteVideoPath ;
 	ofFile myFile;
-	if (myFile.doesFileExist(absouluteVideoPath, false)) {
+	if (myFile.doesFileExist(absouluteVideoPath, true)) {
 		cout << " Le fichier video existe\n ";
 	}
 
-	vidPresentation.load(absouluteVideoPath);
-	//vidPresentation.load("intro.mp4");
+	//vidPresentation.load(absouluteVideoPath);
+	vidPresentation.load("intro.mp4");
 	if (!vidPresentation.isLoaded()) {
 		cout << "\n Erreur chargement video : path : ";
 		cout << absouluteVideoPath + "\n";
@@ -74,7 +74,7 @@ void ofApp::setup(){
     vidPresentation.stop();
     
     // Load xml file from directory scanning
-	if (XML.load(dir.getAbsolutePath() + "/scan.xml")) {
+	if (XML.load("scan.xml")) {
 		cout << "\n chargement du fichier XML ";
 	}
 	else {
@@ -152,6 +152,9 @@ void ofApp::setup(){
 	Hide Mouse
 	********************************/
 	ofHideCursor();
+
+	// Initialise the Spout senderSpout with a channel name
+	senderSpout.init("Mecanique Panorama");
 
     
 
@@ -320,7 +323,7 @@ void ofApp::draw(){
 		********************************/
 		warper.begin();
 		fboBlurTwoPass.draw(0, 0, ofGetWidth(), ofGetHeight());
-		
+		senderSpout.send(fboBlurTwoPass.getTexture());
 		/***********************************
 			Draw : 5 . Draw Vignette if loading
 		********************************/
@@ -364,6 +367,7 @@ void ofApp::draw(){
 		********************************************************/
 		warper.begin();
 		vidPresentation.draw(0, 0, ofGetWidth(), ofGetHeight());
+		senderSpout.send(vidPresentation.getTexture());
 		if (warper.isActive()) {
 			warper.draw();
 		}
@@ -536,7 +540,7 @@ void ofApp::listNumSequence(){
 	//start this function at the beggining, calculate the number of
 	//sequence, according to the scan.xml file
 
-	cout<< "\n *** List Num Sequence : working directory : "+dir.getAbsolutePath()+"\n";
+	cout<< "\n *** List Num Sequence : working directory : MP \n";
 	totalNumSequence = 0;
 
 	dir.listDir();
@@ -599,7 +603,7 @@ void ofApp::listNumSequence(){
 // This function replace ofSetDataPathRoot, which is not working on windows with a change of disk form C: to D:
 string ofApp::path(string p) {
 
-	return dir.getAbsolutePath() + "/" + p;
+	return p;
 }
 
 

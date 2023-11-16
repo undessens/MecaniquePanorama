@@ -17,6 +17,7 @@
 #include <math.h>       /* pow */
 #include "ofxXmlSettings.h"
 #include "ofxGLWarper.h"
+#include "ofxSpout.h"
 #define IMGSIZEW (1920)
 #define IMGSIZEH (1080)
 #define EXPO (1.8f)
@@ -97,6 +98,8 @@ class ofApp : public ofBaseApp
 	long double screenSaverTime;
     
     float blur;
+
+	ofxSpout::Sender senderSpout;
     
 };
 

@@ -3,4 +3,5 @@ ofxGui
 ofxImageSequence
 ofxOpenCv
 ofxOsc
+ofxSpout
 ofxXmlSettings
