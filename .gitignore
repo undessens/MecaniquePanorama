@@ -10,4 +10,5 @@ arduino/.DS_Store
 ImageSeqFromOSC/*
 !ImageSeqFromOSC/src
 !ImageSeqFromOSC/addons.make
+!ImageSeqFromOSC/bin/data
 *.obj
