@@ -144,14 +144,16 @@ void ofApp::setup(){
 	/*******************************
 	Quad warper
 	********************************/
+	/*
 	warper.setup(0, 0, IMGSIZEW, IMGSIZEH);
 	warper.load(path("corner_settings.xml"));
 	//warper.activate();
+	*/
 
 	/*******************************
 	Hide Mouse
 	********************************/
-	ofHideCursor();
+	//ofHideCursor();
 
 	// Initialise the Spout senderSpout with a channel name
 	senderSpout.init("Mecanique Panorama");
@@ -228,6 +230,7 @@ void ofApp::update(){
 	/******************************************************************
 	Update blur amount ( initiated in loadSequence() ), then decreased here
 	********************************************************************/
+
     if(loadingTime > loadingDuration){
 	    if(blur < 0.3 ){
 			isLoading = false;
@@ -245,21 +248,18 @@ void ofApp::update(){
         vidPresentation.update();
     }
 
-
 	/**********************************************************
 	Test mode. Increase frame one by one to test the real performance
 	*************************************************************/
 
 	if (currentSequence > 0 && isTestMode) {
-		if (indexFrame < (sequence.getTotalFrames()-1 )) {
+		if (indexFrame < (sequence.getTotalFrames() - 1)) {
 			indexFrame++;
 		}
 		else {
 			indexFrame = 0;
 		}
 	}
-		
-		
 
 
 
@@ -289,18 +289,9 @@ void ofApp::draw(){
 		/**************************************************
 			Draw : 2 . Draw sequence from mouse or index frame
 		***************************************************/
-        if(playingMouse){
-			float percent = ofMap(mouseX, 0, ofGetWidth(), 0.0, 1.0, true);
-            indexFrame = sequence.getFrameIndexAtPercent(percent);
-            if(indexFrame==0 || indexFrame != lastIndexFrame)  loadCurrentImage();
+		if (indexFrame == 0 || indexFrame != lastIndexFrame) {
+			loadCurrentImage();
 			
-            currentImg.draw(0, 0, IMGSIZEW, IMGSIZEH);
-	    lastIndexFrame = indexFrame;
-        }
-        else{
-			if (indexFrame == 0 || indexFrame != lastIndexFrame) {
-				loadCurrentImage();
-			}
 	    currentImg.draw(0, 0, IMGSIZEW, IMGSIZEH);
 		//sequence.getTextureForFrame(indexFrame).draw(0, 0, IMGSIZEW, IMGSIZEH);
 		lastIndexFrame = indexFrame;
@@ -321,31 +312,26 @@ void ofApp::draw(){
 		/***********************************
 			Draw : 4 . Draw fbo inside quad warper
 		********************************/
-		warper.begin();
 		fboBlurTwoPass.draw(0, 0, ofGetWidth(), ofGetHeight());
 		senderSpout.send(fboBlurTwoPass.getTexture());
 		/***********************************
 			Draw : 5 . Draw Vignette if loading
 		********************************/
+		/*
 		if (isLoading) {
 
 			ofSetColor(255);
 			ofEnableAlphaBlending();
 			listOfVignette[currentSequence - 1].draw(0, 0, ofGetWidth(), ofGetHeight());
 			ofDisableAlphaBlending();
-
 		}
+		*/
         /***********************************
          Draw : 6 . Draw Icon number everytime
          ********************************/
             //ofSetColor(255);22222ofDisableAlphaBlending();
         
-		/***********************************
-			Draw : 7 . Draw warper corner if needed
-		********************************/
-		if (warper.isActive()) {
-			warper.draw();
-		}
+
 		/***********************************
 			Draw : 8 . Draw FPS if needed
 		********************************/
@@ -355,8 +341,7 @@ void ofApp::draw(){
 			ofDrawBitmapStringHighlight(ofToString(indexFrame), ofVec2f(ofGetWidth() / 2, (ofGetHeight() / 2) - 25), ofColor::black, ofColor::white);
 			ofDrawBitmapStringHighlight(ofToString(nbMsgReceived), ofVec2f(ofGetWidth() / 2, (ofGetHeight() / 2) + 25), ofColor::black, ofColor::white);
 		}
-	
-		warper.end();
+
 		
 
 	}
@@ -365,13 +350,9 @@ void ofApp::draw(){
 		/******************************************************
 		If no sequence ( sequence = 0 ), draw video presentation
 		********************************************************/
-		warper.begin();
 		vidPresentation.draw(0, 0, ofGetWidth(), ofGetHeight());
 		senderSpout.send(vidPresentation.getTexture());
-		if (warper.isActive()) {
-			warper.draw();
-		}
-		warper.end();
+
         
 	}
     
@@ -395,22 +376,6 @@ void ofApp::keyPressed(int key){
 		break;
 		case 't': isTestMode = !isTestMode;
 			break;
-        case 'w':
-			if (warper.isActive()) {
-				warper.deactivate();
-				ofHideCursor();
-				warper.saveToXml(xml_warper);
-				ofLogNotice(xml_warper.toString());
-				//xml.setName("war_settings");
-				if (!xml_warper.save(path("corner_settings.xml"))) {
-					ofLogError() << "Couldn't save points.xml";
-				}
-			}
-			else {
-				warper.activate();
-				ofShowCursor();
-			}
-        break;
 		case '1':loadSequence(1);
 		break;
 		case '2':loadSequence(2);
@@ -580,16 +545,21 @@ void ofApp::listNumSequence(){
         listOfNbDigit.push_back(nbDigit);
 		listOfCurrentFrame.push_back(0);
 
+		/*
 		if( !img.load(dirOfSeq.getAbsolutePath()+"/intro.png")){
 			img.allocate(1280, 720 , OF_IMAGE_COLOR);
 		}
 		listOfVignette.push_back(img);
+		*/
         
+		/*
+		
         ofImage icon ;
         if( !icon.load(path("icon/"+ofToString(i)+".png"))) {
             icon.allocate(200, 200 , OF_IMAGE_COLOR);
         }
         listOfIcon.push_back(icon);
+		*/
         
         
         
@@ -625,30 +595,6 @@ void ofApp::mouseDragged(int x, int y, int button){
 //--------------------------------------------------------------
 void ofApp::mousePressed(int x, int y, int button){
 
-	// ON right click
-	if (button == 2) {
-		// Both right and left click : quit app
-		if (ofGetMousePressed(0)) {
-			ofExit();
-		}
-		else {
-			if (warper.isActive()) {
-				ofHideCursor();
-				warper.deactivate();
-				warper.saveToXml(xml_warper);
-				ofLogNotice(xml_warper.toString());
-				//xml.setName("war_settings");
-				if (!xml_warper.save(path("corner_settings.xml"))) {
-					ofLogError() << "Couldn't save points.xml";
-				}
-			}
-			else {
-				ofShowCursor();
-				warper.activate();
-			}
-
-		}
-	}
 
 }
 
