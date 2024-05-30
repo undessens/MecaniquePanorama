@@ -103,7 +103,7 @@ void ofApp::setup(){
 	Load sequence 0 ( conflict with arduino that start sequence 1 at start )
 	********************************/
 	cout << "\n Load sequence 0 ";
-	loadSequence(0);
+	loadSequence(2);
 
 	/*******************************
 	Screen saver 
@@ -216,7 +216,8 @@ void ofApp::update(){
 	/******************************************************************
 	Update Screen saver : #define SCREEN_SAVER (350)
 	********************************************************************/
-	if ((ofGetElapsedTimef() - screenSaverTime) > SCREEN_SAVER && currentSequence>0) {
+	//if ((ofGetElapsedTimef() - screenSaverTime) > SCREEN_SAVER && currentSequence>0) {
+	if(false){
 		ofLogNotice("Screen saver is starting");
 
 		loadSequence(0);
