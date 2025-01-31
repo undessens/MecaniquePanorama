@@ -53,7 +53,7 @@ void ofApp::setup(){
 #elif _WIN32
 	cout << "WINDOWS CONFIGURATION \n";
 	std::string username = getCurrentUsername();
-	filesystem::path mydatapath = "C:/Users/" + username + "/Documents/MecaniquePanorama";
+	filesystem::path mydatapath = "C:/Users/" + username + "/Documents/MecaniquePanorama/ImageSeqFromOSC/bin/data";
 	dir = ofDirectory(mydatapath);
 	ofSetDataPathRoot(mydatapath);
 #else
