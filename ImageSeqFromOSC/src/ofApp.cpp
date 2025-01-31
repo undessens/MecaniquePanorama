@@ -16,6 +16,30 @@
 
 #include "ofApp.h"
 
+std::string getCurrentUsername() {
+	char username[256];
+
+#ifdef _WIN32
+	DWORD username_len = sizeof(username);
+	if (GetUserName(username, &username_len)) {
+		return std::string(username);
+	}
+	else {
+		throw std::runtime_error("Unable to get username.");
+	}
+#else
+	struct passwd* pw;
+	uid_t uid = geteuid();
+	pw = getpwuid(uid);
+	if (pw) {
+		return std::string(pw->pw_name);
+	}
+	else {
+		throw std::runtime_error("Unable to get username.");
+	}
+#endif
+}
+
 //--------------------------------------------------------------
 void ofApp::setup(){
 	
@@ -28,8 +52,8 @@ void ofApp::setup(){
     ofSetDataPathRoot(mydatapath);
 #elif _WIN32
 	cout << "WINDOWS CONFIGURATION \n";
-	filesystem::path mydatapath = "E:/MecaniquePanorama/";
-	//filesystem::path mydatapath = "C:/Users/Aurelien/Documents/OPENFRAMEWORKS/of_v0.10.0_vs2017_release/apps/MecaniquePanorama/ImageSeqFromOSC/bin/data/";
+	std::string username = getCurrentUsername();
+	filesystem::path mydatapath = "C:/Users/" + username + "/Documents/MecaniquePanorama";
 	dir = ofDirectory(mydatapath);
 	ofSetDataPathRoot(mydatapath);
 #else
@@ -38,6 +62,7 @@ void ofApp::setup(){
  	dir = ofDirectory(mydatapath);
 	ofSetDataPathRoot(mydatapath);
 #endif
+
     
     //Out the current directory
     cout << "\n Directory of MP data ( video + image ) : " + dir.getOriginalDirectory();
